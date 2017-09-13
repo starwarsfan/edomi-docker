@@ -21,8 +21,8 @@ if [ -z "$HOSTIP" ]; then
 	echo "HOSTIP not set, using edomi default settings."
 else
 	echo "HOSTIP set to $HOSTIP ... configure $EDOMI_CONF and $HTTPD_CONF"
-	sed -i -e "s#global_serverIP.*#global_serverIP='$HOSTIP'#" \
-	       -e "s/^ServerName.*/ServerName $HOSTIP/g" ${HTTPD_CONF}
+	sed -i -e "s#global_serverIP.*#global_serverIP='$HOSTIP'#" ${EDOMI_CONF}
+	sed -i -e "s/^ServerName.*/ServerName $HOSTIP/g" ${HTTPD_CONF}
 fi
 
 if [ -z "$KNXGATEWAY" ]; then 
