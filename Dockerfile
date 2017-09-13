@@ -1,13 +1,27 @@
 FROM centos:6.8
 
+# Define build arguments
 ARG EDOMI_VERSION=EDOMI-Beta_152.zip
 ARG ROOT_PASS=123456
 
+# Define environment vars
 ENV EDOMI_VERSION=${EDOMI_VERSION} \
     EDOMI_ZIP=/tmp/edomi.zip \
     EDOMI_INSTALL_PATH=/tmp/edomi/Install/ \
     START_SCRIPT=/root/start.sh \
-    ROOT_PASS=${ROOT_PASS}
+    ROOT_PASS=${ROOT_PASS} \
+    EDOMI_BACKUP_DIR=/var/edomi-backups
+
+# Mount point for Edomi backups
+VOLUME ${EDOMI_BACKUP_DIR}
+
+# Set root passwd
+RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root)
+
+# Copy install script and entrypoint script
+COPY bin/install.sh ${EDOMI_INSTALL_PATH}
+COPY bin/start.sh ${START_SCRIPT}
+#RUN chmod +x ${START_SCRIPT}
 
 RUN yum update -y \
  && yum upgrade -y \
@@ -30,19 +44,12 @@ RUN yum update -y \
 	mod_ssl
 
 ADD http://edomi.de/download/install/${EDOMI_VERSION} ${EDOMI_ZIP}
-RUN unzip -q ${EDOMI_ZIP} -d /tmp/
-COPY bin/install.sh ${EDOMI_INSTALL_PATH}
-RUN cd ${EDOMI_INSTALL_PATH} \
+RUN unzip -q ${EDOMI_ZIP} -d /tmp/ \
+ && cd ${EDOMI_INSTALL_PATH} \
  && ./install.sh
 
-# set root passwd
-RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root)
+# Enable ssl for edomi
+RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
+           -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf
 
-# enable ssl for edomi
-RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" /etc/httpd/conf.d/ssl.conf
-RUN sed -i -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf
-
-# copy entrypoint script
-COPY bin/start.sh ${START_SCRIPT}
-RUN chmod +x ${START_SCRIPT}
 CMD ["/root/start.sh"]
