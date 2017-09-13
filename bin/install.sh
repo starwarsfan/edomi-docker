@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # EDOMI-Hauptpfad (NICHT ÄNDERN!)
 MAIN_PATH="/usr/local/edomi"
 
@@ -8,7 +10,6 @@ install_timezone () {
 }
 
 install_config () {
-
 	# Firewall
 	cp config/config /etc/selinux/
 	
@@ -45,14 +46,13 @@ install_edomi () {
 	service mysqld stop
 	sleep 1
 
-	if [ -f "EDOMI/EDOMI-Backup.edomibackup" ]
-	then
+	if [ -f "EDOMI/EDOMI-Backup.edomibackup" ] ; then
 		tar -xf EDOMI/EDOMI-Backup.edomibackup -C /
-		chmod 777 -R $MAIN_PATH		
+		chmod 777 -R ${MAIN_PATH}
 	else
-		mkdir -p $MAIN_PATH
-		tar -xf EDOMI/EDOMI-Public.edomiinstall -C $MAIN_PATH --strip-components=3
-		chmod 777 -R $MAIN_PATH
+		mkdir -p ${MAIN_PATH}
+		tar -xf EDOMI/EDOMI-Public.edomiinstall -C ${MAIN_PATH} --strip-components=3
+		chmod 777 -R ${MAIN_PATH}
 	fi
 }
 
