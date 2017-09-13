@@ -3,10 +3,9 @@ FROM centos:6.8
 ARG EDOMI_VERSION=EDOMI-Beta_152.zip
 ARG ROOT_PASS=123456
 
-ENV EDOMI_TMP_PATH=/tmp \
-    EDOMI_VERSION=${EDOMI_VERSION} \
-    EDOMI_ZIP=${EDOMI_TMP_PATH}/edomi.zip \
-    EDOMI_INSTALL_PATH=${EDOMI_TMP_PATH}/edomi/Install/ \
+ENV EDOMI_VERSION=${EDOMI_VERSION} \
+    EDOMI_ZIP=/tmp/edomi.zip \
+    EDOMI_INSTALL_PATH=/tmp/edomi/Install/ \
     START_SCRIPT=/root/start.sh \
     ROOT_PASS=${ROOT_PASS}
 
@@ -31,7 +30,7 @@ RUN yum update -y \
 	mod_ssl
 
 ADD http://edomi.de/download/install/${EDOMI_VERSION} ${EDOMI_ZIP}
-RUN unzip -q ${EDOMI_ZIP} -d ${EDOMI_TMP_PATH}
+RUN unzip -q ${EDOMI_ZIP} -d /tmp/
 COPY bin/install.sh ${EDOMI_INSTALL_PATH}
 RUN cd ${EDOMI_INSTALL_PATH} \
  && ./install.sh
