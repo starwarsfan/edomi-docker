@@ -1,4 +1,4 @@
-FROM centos:6.8
+FROM edomi-baseimage:6.8.0
 
 # Define build arguments
 ARG EDOMI_VERSION=EDOMI-Beta_152.zip
@@ -20,27 +20,7 @@ RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root)
 
 # Copy entrypoint script
 COPY bin/start.sh ${START_SCRIPT}
-#RUN chmod +x ${START_SCRIPT}
-
-RUN yum update -y \
- && yum upgrade -y \
- && yum -y install \
-	nano \
-	wget \
-	unzip \
-	php-devel \
-	mysql \
-	mysql-server \
-	vsftpd \
-	httpd \
-	tar \
-	php-gd \
-	php-mysql \
-	php-pear \
-	php-soap \
-	ntp \
-	openssh-server \
-	mod_ssl
+RUN chmod +x ${START_SCRIPT}
 
 ADD http://edomi.de/download/install/${EDOMI_VERSION} ${EDOMI_ZIP}
 RUN unzip -q ${EDOMI_ZIP} -d /tmp/
