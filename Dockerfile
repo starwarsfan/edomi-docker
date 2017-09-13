@@ -1,4 +1,4 @@
-FROM edomi-baseimage:6.8.0
+FROM starwarsfan/edomi-baseimage:6.8.0
 
 # Define build arguments
 ARG EDOMI_VERSION=EDOMI-Beta_152.zip
