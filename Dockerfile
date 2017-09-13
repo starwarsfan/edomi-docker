@@ -4,9 +4,9 @@ ARG EDOMI_VERSION=EDOMI-Beta_152.zip
 ARG ROOT_PASS=123456
 
 ENV EDOMI_TMP_PATH=/tmp \
-	EDOMI_VERSION=${EDOMI_VERSION} \
-    EDOMI_ZIP=$EDOMI_TMP_PATH/edomi.zip \
-    EDOMI_INSTALL_PATH=$EDOMI_TMP_PATH/edomi/Install/ \
+    EDOMI_VERSION=${EDOMI_VERSION} \
+    EDOMI_ZIP=${EDOMI_TMP_PATH}/edomi.zip \
+    EDOMI_INSTALL_PATH=${EDOMI_TMP_PATH}/edomi/Install/ \
     START_SCRIPT=/root/start.sh \
     ROOT_PASS=${ROOT_PASS}
 
@@ -33,7 +33,8 @@ RUN yum update -y \
 ADD http://edomi.de/download/install/${EDOMI_VERSION} ${EDOMI_ZIP}
 RUN unzip -q ${EDOMI_ZIP} -d ${EDOMI_TMP_PATH}
 COPY bin/install.sh ${EDOMI_INSTALL_PATH}
-RUN cd ${EDOMI_INSTALL_PATH} && ./install.sh
+RUN cd ${EDOMI_INSTALL_PATH} \
+ && ./install.sh
 
 # set root passwd
 RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root)
