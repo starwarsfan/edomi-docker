@@ -18,8 +18,7 @@ VOLUME ${EDOMI_BACKUP_DIR}
 # Set root passwd
 RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root)
 
-# Copy install script and entrypoint script
-COPY bin/install.sh ${EDOMI_INSTALL_PATH}
+# Copy entrypoint script
 COPY bin/start.sh ${START_SCRIPT}
 #RUN chmod +x ${START_SCRIPT}
 
@@ -44,8 +43,11 @@ RUN yum update -y \
 	mod_ssl
 
 ADD http://edomi.de/download/install/${EDOMI_VERSION} ${EDOMI_ZIP}
-RUN unzip -q ${EDOMI_ZIP} -d /tmp/ \
- && cd ${EDOMI_INSTALL_PATH} \
+RUN unzip -q ${EDOMI_ZIP} -d /tmp/
+
+# Copy install script and entrypoint script
+COPY bin/install.sh ${EDOMI_INSTALL_PATH}
+RUN cd ${EDOMI_INSTALL_PATH} \
  && ./install.sh
 
 # Enable ssl for edomi
