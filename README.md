@@ -50,17 +50,24 @@ sudo docker pull starwarsfan/edomi
 
 #### 2b Build from scratch
 
-##### Pull edomi-docker from github
+The image build is split into two separate build steps. The first step generates updated CentOS 
+base image with all required packages. The second step build the Edomi image, which is based on
+the image from the first build step.
+
+##### Pull edomi-docker repo from github
 
 ```shell
 sudo git clone https://github.com/starwarsfan/edomi-docker.git
 cd edomi-docker
 ```
 
-##### Pull Centos 6.8 docker image and build Edomi container
+##### Pull Centos 6.8 docker image, build base and Edomi image
 
 ```shell
 sudo docker pull centos:6.8
+cd edomi-baseimage
+sudo docker build -t starwarsfan/edomi-baseimage:6.8.0 .
+cd ..
 sudo docker build -t starwarsfan/edomi:latest .
 ```
 
