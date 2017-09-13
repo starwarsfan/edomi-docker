@@ -74,12 +74,22 @@ sudo docker build -t starwarsfan/edomi:latest --build-arg ROOT_PASS=Th3Passw0rd 
 sudo docker run --name edomi -p 42900:80 -p 42901:443 -p 22222:22 -p 50000:50000/udp -p 50001:50001/udp -e KNXGATEWAY=192.168.178.4 -e KNXACTIVE=true -e HOSTIP=192.168.178.3 -d pfischi/edomi:latest
 ```
 
-With this configuration the edomi web instance is reachable via http://<docker-host-ip>:42900/admin and or 
-https://<docker-host-ip>:42901/admin, the ssh server with 
-ssh -p 22222 <docker-host-ip>. With The (optional) parameters KNXGATEWAY, KNXACTIVE and HOSTIP you can pre-configure 
-some settings for Edomi. Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "global_serverIP" 
-in Edomi (or via docker run script 'HOSTIP') to your Docker host IP otherwise the KNX communication probably will not work.
+With this configuration the edomi web instance is reachable via URL _http://<docker-host-ip>:42900/admin_ or 
+_https://<docker-host-ip>:42901/admin_ and the commandline via ssh with _ssh -p 22222 <docker-host-ip>_.
+With the (optional) parameters KNXGATEWAY, KNXACTIVE and HOSTIP you can pre-configure some settings for Edomi. 
+Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "global_serverIP" in Edomi (or via 
+docker run script 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
 Change http and/or https port to your needs.
+
+#### 3.a Mount volume or folder for backups
+
+With the additional run parameter _-v <host-folder>:/var/edomi-backups/_ you can mount a folder on the docker 
+host which contains the Edomi backups outside of the container. So the run command may look like the following example:
+
+```shell
+sudo docker run --name edomi -v /data/edomi-backups/:/var/edomi-backups/ ...
+```
+
 
 ### 4. Autostart Edomi Docker container
 
