@@ -102,26 +102,32 @@ sudo systemctl enable docker-edomi.service
 
 ### 5. Useful commands
 
-check running / stopped container
+Check running / stopped container:
 
 ```shell
 sudo docker ps -a
 ```
 
-stop the container
+Stop the container
 
 ```shell
 sudo docker stop edomi
 ```
 
-start the container
+Start the container
 
 ```shell
 sudo docker start edomi
 ```
 
-get logs from container
+Get logs from container
 
 ```shell
 sudo docker logs -f edomi
+```
+
+Open cmdline inside of container
+
+```shell
+sudo docker exec -i -t edomi /bin/bash
 ```
