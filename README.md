@@ -2,12 +2,12 @@
  
  This is a docker implementation for Edomi, a PHP-based smarthome framework.
  It is based on the initial work of [pfischi](https://github.com/pfischi/edomi-docker), thx a lot!
+
  For more information please refer to:
  
- [Official website](http://www.edomi.de/)
- [Support forum](https://knx-user-forum.de/forum/projektforen/edomi)
+ [Official website](http://www.edomi.de/) or [Support forum](https://knx-user-forum.de/forum/projektforen/edomi)
 
- This instruction works for a <b>Centos7</b> docker host. Other distributions need some adjustments.
+ This instruction works for a <b>Centos7</b> docker host. Other distributions may need some adjustments.
 
 
 ### 1. Install docker
@@ -35,14 +35,17 @@ sudo systemctl start docker.service
 
 ### 2. Build the Edomi Container
 
-You now have two options: build from scratch or pull the ready-made image from DockerHub. 
+You now have two options: 
+- Build from scratch or 
+- Pull the ready-made image from DockerHub. 
+
 The Edomi archive together with all required packages will be downloaded during docker build. 
 I've added openssh-server and additionally I've set the root password to '123456'.
 
 #### 2a Image from Docker Hub
 
 ```shell
-sudo docker pull pfischi/edomi
+sudo docker pull starwarsfan/edomi
 ```
 
 #### 2b Build from scratch
