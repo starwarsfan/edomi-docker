@@ -84,8 +84,8 @@ sudo docker build -t starwarsfan/edomi:latest --build-arg ROOT_PASS=Th3Passw0rd 
 sudo docker run --name edomi --net=host --restart=on-failure -p 22222:22 -e KNXGATEWAY=192.168.178.4 -e KNXACTIVE=true -e HOSTIP=192.168.178.3 -d starwarsfan/edomi:latest
 ```
 
-With this configuration the edomi web instance is reachable via URL _http://<docker-host-ip>/admin_ or 
-_https://<docker-host-ip>/admin_ and the commandline via ssh with _ssh -p 22222 <docker-host-ip>_.
+With this configuration the edomi web instance is reachable via URL _http://\<docker-host-ip\>/admin_ or 
+_https://\<docker-host-ip\>/admin_ and the commandline via ssh with _ssh -p 22222 \<docker-host-ip\>_.
 With the (optional) parameters KNXGATEWAY, KNXACTIVE and HOSTIP you can pre-configure some settings for Edomi. 
 Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "global_serverIP" in Edomi (or via 
 docker run script 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
