@@ -39,29 +39,6 @@ else
 	sed -i -e "s#global_knxGatewayActive=.*#global_knxGatewayActive='$KNXACTIVE'#" ${EDOMI_CONF}
 fi
 
-set -x
-
-pid=0
-
-# SIGUSR1-handler
-my_handler() {
-	echo "my_handler"
-}
-
-# SIGTERM-handler
-term_handler() {
-	if [ ${pid} -ne 0 ]; then
-		kill -SIGTERM "$pid"
-		wait "$pid"
-	fi
-	exit 143; # 128 + 15 -- SIGTERM
-}
-
-# Setup handlers
-# On callback, kill the last background process, which is `tail -f /dev/null` and execute the specified handler
-trap 'kill ${!}; my_handler' SIGUSR1
-trap 'kill ${!}; term_handler' SIGTERM
-
 service mysqld start
 service vsftpd start
 service httpd start
@@ -69,9 +46,26 @@ service ntpd start
 service sshd start
 /usr/local/edomi/main/start.sh &
 
-pid="$!"
+# Edomi start script is ended either by call of 'reboot' or 'shutdown'.
+# These two files are replaced by helper scripts and their output is
+# evaluated during the next steps.
+#
+# But at first wait until Edomi background script is exited.
+wait
 
-# wait forever
-while true ; do
-	tail -f /dev/null & wait ${!}
-done
+if [ -e /tmp/doReboot ] ; then
+	# Edomi called 'reboot'
+    rm -f /tmp/do*
+    # Trigger container restart by simulating an internal error
+    # Container must be startet with opeion "--restart=on-failure"
+    echo "Exiting container with return value 1 to trigger Docker restart"
+    exit 1
+elif [ -e /tmp/doShutdown ] ; then
+	# Edomi called 'shutdown'
+    rm -f /tmp/do*
+fi
+
+# Exit container with 0, so Docker will not restart it
+# Container must be startet with opeion "--restart=on-failure"
+echo "Exiting container with return value 0 to prevent Docker restarting it"
+exit 0
