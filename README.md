@@ -1,4 +1,4 @@
-## edomi-docker (Edomi release: v1.48)
+## edomi-docker (Edomi release 1.52)
  
  This is a docker implementation for Edomi, a PHP-based smarthome framework.
  It is based on the initial work of [pfischi](https://github.com/pfischi/edomi-docker), thx a lot!
@@ -91,12 +91,12 @@ Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "glob
 docker run script 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
 Change http and/or https port to your needs.
 
-Note 1:
+**Note 1:**
 It is important to use the option _--net=host_, otherwise the websocket connection for the visu will not work.
 At the moment this may be a drawback, if you need http- a/o https-ports on your Docker host for something else
 than Edomi.
 
-Note 2:
+**Note 2:**
 It is important to use the option _--restart=on-failure_ because it is used to handle Edomi shutdown or restart
 from the admin ui. The trick is to exit the container with a non zero exit code in case Edomi should be restartet.
 If it should be shut down, the exit code will be zero, which is not a failure for Docker and so the container
