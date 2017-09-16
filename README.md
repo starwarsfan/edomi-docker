@@ -81,7 +81,7 @@ sudo docker build -t starwarsfan/edomi:latest --build-arg ROOT_PASS=Th3Passw0rd 
 ### 3. Starting docker container
 
 ```shell
-sudo docker run --name edomi --net=host --restart=on-failure -p 22222:22 -e KNXGATEWAY=192.168.178.4 -e KNXACTIVE=true -e HOSTIP=192.168.178.3 -d pfischi/edomi:latest
+sudo docker run --name edomi --net=host --restart=on-failure -p 22222:22 -e KNXGATEWAY=192.168.178.4 -e KNXACTIVE=true -e HOSTIP=192.168.178.3 -d starwarsfan/edomi:latest
 ```
 
 With this configuration the edomi web instance is reachable via URL _http://<docker-host-ip>/admin_ or 
