@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# ============================================================================
+# Helper script to handle Edomi initiated system shutdown out of Docker
+# container.
+# See https://knx-user-forum.de/forum/projektforen/edomi
+# 2017-09-16 Y. Schumann (starwarsfan)
+# ============================================================================
+touch /tmp/doShutdown
