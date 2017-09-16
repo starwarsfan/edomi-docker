@@ -53,6 +53,19 @@ service sshd start
 # But at first wait until Edomi background script is exited.
 wait
 
+# Handle if Edomi restore process is running, which will be sent to background
+# by Edomi main script. So at this point the Edomi start script is finished but
+# restore script might be running.
+while true ; do
+    sleep 5
+    if $(ps aux | grep -v grep | grep "/tmp/edomirestore.sh" -q) ; then
+		echo "Edomi restore is running..."
+		continue
+    else
+		break
+    fi
+done
+
 if [ -e /tmp/doReboot ] ; then
 	# Edomi called 'reboot'
     rm -f /tmp/do*
