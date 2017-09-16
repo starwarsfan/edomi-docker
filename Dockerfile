@@ -43,6 +43,6 @@ RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
 
 # Update to handle websocket. Can be removed later if already implemented that way,
 # see https://knx-user-forum.de/forum/projektforen/edomi/900020-edomi-releases-updates-aktuell-version-1-52?p=1126332#post1126332
-RUN sed "s/visu_socket.open.*$/visu_socket.open(window.location.host,<?echo global_visuWebsocketPort;?>);/g" /usr/local/edomi/www/visu/apps/app0.php
+RUN sed -i "s/visu_socket.open.*$/visu_socket.open(window.location.host,<?echo global_visuWebsocketPort;?>);/g" /usr/local/edomi/www/visu/apps/app0.php
 
 CMD ["/root/start.sh"]
