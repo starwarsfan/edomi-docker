@@ -81,15 +81,26 @@ sudo docker build -t starwarsfan/edomi:latest --build-arg ROOT_PASS=Th3Passw0rd 
 ### 3. Starting docker container
 
 ```shell
-sudo docker run --name edomi -p 42900:80 -p 42901:443 -p 22222:22 -p 50000:50000/udp -p 50001:50001/udp -e KNXGATEWAY=192.168.178.4 -e KNXACTIVE=true -e HOSTIP=192.168.178.3 -d pfischi/edomi:latest
+sudo docker run --name edomi --net=host --restart=on-failure -p 22222:22 -e KNXGATEWAY=192.168.178.4 -e KNXACTIVE=true -e HOSTIP=192.168.178.3 -d pfischi/edomi:latest
 ```
 
-With this configuration the edomi web instance is reachable via URL _http://<docker-host-ip>:42900/admin_ or 
-_https://<docker-host-ip>:42901/admin_ and the commandline via ssh with _ssh -p 22222 <docker-host-ip>_.
+With this configuration the edomi web instance is reachable via URL _http://<docker-host-ip>/admin_ or 
+_https://<docker-host-ip>/admin_ and the commandline via ssh with _ssh -p 22222 <docker-host-ip>_.
 With the (optional) parameters KNXGATEWAY, KNXACTIVE and HOSTIP you can pre-configure some settings for Edomi. 
 Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "global_serverIP" in Edomi (or via 
 docker run script 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
 Change http and/or https port to your needs.
+
+Note 1:
+It is important to use the option _--net=host_, otherwise the websocket connection for the visu will not work.
+At the moment this may be a drawback, if you need http- a/o https-ports on your Docker host for something else
+than Edomi.
+
+Note 2:
+It is important to use the option _--restart=on-failure_ because it is used to handle Edomi shutdown or restart
+from the admin ui. The trick is to exit the container with a non zero exit code in case Edomi should be restartet.
+If it should be shut down, the exit code will be zero, which is not a failure for Docker and so the container
+will not be restartet again.
 
 #### 3.a Mount volume or folder for backups
 

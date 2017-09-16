@@ -15,15 +15,19 @@ ENV EDOMI_VERSION=${EDOMI_VERSION} \
 # Mount point for Edomi backups
 VOLUME ${EDOMI_BACKUP_DIR}
 
-# Expose websocket port
-EXPOSE 8080
-
-# Set root passwd
-RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root)
+# Set root passwd and rename 'reboot' and 'shutdown' commands
+RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root) \
+ && mv /sbin/shutdown /sbin/shutdown_ \
+ && mv /sbin/reboot /sbin/reboot_
 
 # Copy entrypoint script
 COPY bin/start.sh ${START_SCRIPT}
-RUN chmod +x ${START_SCRIPT}
+
+# Copy reboot and shutdown helper scripts
+COPY sbin/reboot sbin/shutdown /sbin/
+
+# Make scripts executable
+RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown
 
 ADD http://edomi.de/download/install/${EDOMI_VERSION} ${EDOMI_ZIP}
 RUN unzip -q ${EDOMI_ZIP} -d /tmp/
