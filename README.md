@@ -1,11 +1,9 @@
-## edomi-docker (Edomi release 1.52)
+## Edomi-Docker (Edomi release 1.52)
  
  This is a docker implementation for Edomi, a PHP-based smarthome framework.
  It is based on the initial work of [pfischi](https://github.com/pfischi/edomi-docker), thx a lot!
 
- For more information please refer to:
- 
- [Official website](http://www.edomi.de/) or [Support forum](https://knx-user-forum.de/forum/projektforen/edomi)
+ For more information please refer to [Official website](http://www.edomi.de/) or [Support forum](https://knx-user-forum.de/forum/projektforen/edomi)
 
  This instruction works for a <b>Centos7</b> docker host. Other distributions may need some adjustments.
 
@@ -33,7 +31,7 @@ sudo systemctl enable docker.service
 sudo systemctl start docker.service
 ```
 
-### 2. Build the Edomi Container
+### 2. Build/Use the Edomi Container
 
 You now have two options: 
 - Build from scratch or 
@@ -45,7 +43,7 @@ I've added openssh-server and additionally I've set the root password to '123456
 #### 2a Image from Docker Hub
 
 ```shell
-sudo docker pull starwarsfan/edomi
+sudo docker pull starwarsfan/edomi-docker
 ```
 
 #### 2b Build from scratch
@@ -54,34 +52,34 @@ The image build is split into two separate build steps. The first step generates
 base image with all required packages. The second step build the Edomi image, which is based on
 the image from the first build step.
 
-##### Pull edomi-docker repo from github
+##### Pull Edomi-Docker repo from github
 
 ```shell
 sudo git clone https://github.com/starwarsfan/edomi-docker.git
 cd edomi-docker
 ```
 
-##### Pull Centos 6.8 docker image, build base and Edomi image
+##### Pull CentOS 6.8 docker image, build base and Edomi image
 
 ```shell
 sudo docker pull centos:6.8
 cd edomi-baseimage
 sudo docker build -t starwarsfan/edomi-baseimage:6.8.0 .
 cd ..
-sudo docker build -t starwarsfan/edomi:latest .
+sudo docker build -t starwarsfan/edomi-docker:latest .
 ```
 
 You can pass a different root passwort to the build and you can pass the Edomi version to download too:
 
 ```shell
-sudo docker build -t starwarsfan/edomi:latest --build-arg ROOT_PASS=Th3Passw0rd --build-arg EDOMI_VERSION=EDOMI-Beta_152.zip .
+sudo docker build -t starwarsfan/edomi-docker:latest --build-arg ROOT_PASS=Th3Passw0rd --build-arg EDOMI_VERSION=EDOMI-Beta_152.zip .
 ```
 
 
 ### 3. Starting docker container
 
 ```shell
-sudo docker run --name edomi --net=host --restart=on-failure -p 22222:22 -e KNXGATEWAY=192.168.178.4 -e KNXACTIVE=true -e HOSTIP=192.168.178.3 -d starwarsfan/edomi:latest
+sudo docker run --name edomi --net=host --restart=on-failure -p 22222:22 -e KNXGATEWAY=192.168.178.4 -e KNXACTIVE=true -e HOSTIP=192.168.178.3 -d starwarsfan/edomi-docker:latest
 ```
 
 With this configuration the edomi web instance is reachable via URL _http://\<docker-host-ip\>/admin_ or 

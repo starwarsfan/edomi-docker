@@ -4,7 +4,7 @@ Requires=docker.service
 After=docker.service
 
 [Service]
-Restart=always
+Restart=on-failure
 ExecStart=/usr/bin/docker start -a edomi
 ExecStop=/usr/bin/docker stop -t 2 edomi
 
