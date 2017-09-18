@@ -59,13 +59,9 @@ sudo git clone https://github.com/starwarsfan/edomi-docker.git
 cd edomi-docker
 ```
 
-##### Pull CentOS 6.8 docker image, build base and Edomi image
+##### Build using Edomi baseimage
 
 ```shell
-sudo docker pull centos:6.8
-cd edomi-baseimage
-sudo docker build -t starwarsfan/edomi-baseimage:6.8.0 .
-cd ..
 sudo docker build -t starwarsfan/edomi-docker:latest .
 ```
 
