@@ -1,4 +1,4 @@
-## Edomi-Docker (Release 1.53)
+## Edomi-Docker (Release 1.54)
  
  This is a docker implementation for Edomi, a PHP-based smarthome framework.
  It is based on the initial work of [pfischi](https://github.com/pfischi/edomi-docker), thx a lot!
