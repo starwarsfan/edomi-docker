@@ -61,6 +61,9 @@ while true ; do
     if $(ps aux | grep -v grep | grep "/tmp/edomirestore.sh" -q) ; then
 		echo "Edomi restore is running..."
 		continue
+    elif $(ps aux | grep -v grep | grep "/tmp/edomiupdate.sh" -q) ; then
+		echo "Edomi update is running..."
+		continue
     else
 		break
     fi
