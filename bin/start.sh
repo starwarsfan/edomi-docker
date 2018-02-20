@@ -13,8 +13,8 @@ if [ ! -f ${CSR} ] || [ ! -f ${CAKEY} ] || [ ! -f ${CACRT} ]; then
     openssl req -nodes -newkey rsa:2048 -keyout ${CAKEY} -out ${CSR} -subj "/C=NZ/ST=Metropolis/L=Metropolis/O=/OU=/CN=edomi"
 	openssl x509 -req -days 3650 -in ${CSR} -signkey ${CAKEY} -out ${CACRT}
 
-	sed -i -e "s#^SSLCertificateFile.*$#SSLCertificateFile $CACRT#g" \
-	       -e "s#^SSLCertificateKeyFile.*$#SSLCertificateKeyFile $CAKEY#g" ${SSLCONF}
+	sed -i -e "s#^SSLCertificateFile.*\$#SSLCertificateFile $CACRT#g" \
+	       -e "s#^SSLCertificateKeyFile.*\$#SSLCertificateKeyFile $CAKEY#g" ${SSLCONF}
 fi
 
 if [ -z "$HOSTIP" ]; then 
