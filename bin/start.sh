@@ -17,11 +17,17 @@ if [ ! -f ${CSR} ] || [ ! -f ${CAKEY} ] || [ ! -f ${CACRT} ]; then
 	       -e "s#^SSLCertificateKeyFile.*\$#SSLCertificateKeyFile $CAKEY#g" ${SSLCONF}
 fi
 
+# Determine container IP on Docker network
+CONTAINER_IP=$(hostname -i)
+
 if [ -z "$HOSTIP" ]; then 
 	echo "HOSTIP not set, using edomi default settings."
+	sed -i -e "s#proc_visuIP.*#proc_visuIP='$CONTAINER_IP'#" ${EDOMI_CONF}
 else
 	echo "HOSTIP set to $HOSTIP ... configure $EDOMI_CONF and $HTTPD_CONF"
-	sed -i -e "s#global_serverIP.*#global_serverIP='$HOSTIP'#" ${EDOMI_CONF}
+	sed -i -e "s#global_serverIP.*#global_serverIP='$HOSTIP'#" \
+	       -e "s#proc_knxIP.*#proc_knxIP='$HOSTIP'#" \
+	       -e "s#proc_visuIP.*#proc_visuIP='$CONTAINER_IP'#" ${EDOMI_CONF}
 	sed -i -e "s/^ServerName.*/ServerName $HOSTIP/g" ${HTTPD_CONF}
 fi
 
