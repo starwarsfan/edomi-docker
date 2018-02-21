@@ -1,4 +1,4 @@
-## Edomi-Docker (Release 1.54)
+## Edomi-Docker (Release 1.55)
  
  This is a docker implementation for Edomi, a PHP-based smarthome framework.
  It is based on the initial work of [pfischi](https://github.com/pfischi/edomi-docker), thx a lot!
@@ -34,8 +34,8 @@ sudo systemctl start docker.service
 ### 2. Build/Use the Edomi Container
 
 You now have two options: 
-- Build from scratch or 
 - Pull the ready-made image from DockerHub. 
+- Build from scratch or 
 
 The Edomi archive together with all required packages will be downloaded during docker build. 
 I've added openssh-server and additionally I've set the root password to '123456'.
@@ -52,30 +52,54 @@ The image build is split into two separate build steps. The first step generates
 base image with all required packages. The second step build the Edomi image, which is based on
 the image from the first build step.
 
-##### Pull Edomi-Docker repo from github
+##### Pull Edomi-Docker repos from GitHub
 
 ```shell
+sudo git clone https://github.com/starwarsfan/edomi-baseimage.git
 sudo git clone https://github.com/starwarsfan/edomi-docker.git
-cd edomi-docker
 ```
 
 ##### Build using Edomi baseimage
 
 ```shell
-sudo docker build -t starwarsfan/edomi-docker:latest .
+cd edomi-baseimage
+sudo docker build \
+    -t starwarsfan/edomi-baseimage:6.8.1 .
+```
+
+##### Build using Edomi itself
+
+```shell
+cd edomi-docker
+sudo docker build \
+    -t starwarsfan/edomi-docker:latest .
 ```
 
 You can pass a different root passwort to the build and you can pass the Edomi version to download too:
 
 ```shell
-sudo docker build -t starwarsfan/edomi-docker:latest --build-arg ROOT_PASS=Th3Passw0rd --build-arg EDOMI_VERSION=EDOMI-Beta_152.zip .
+sudo docker build \
+    -t starwarsfan/edomi-docker:latest --build-arg ROOT_PASS=Th3Passw0rd --build-arg EDOMI_VERSION=EDOMI-Beta_155.zip .
 ```
 
 
 ### 3. Starting docker container
 
 ```shell
-sudo docker run --name edomi --net=host --restart=on-failure -p 22222:22 -e KNXGATEWAY=192.168.178.4 -e KNXACTIVE=true -e HOSTIP=192.168.178.3 -d starwarsfan/edomi-docker:latest
+sudo docker run \
+    --name edomi \
+    --restart=on-failure \
+    -p 80:80 \
+    -p 8080:8080 \
+    -p 3671:3671/udp \
+    -p 50000:50000/udp \
+    -p 50001:50001/udp \
+    -p 22222:22 \
+    -e KNXGATEWAY=192.168.178.4 \
+    -e KNXACTIVE=true \
+    -e HOSTIP=192.168.178.3 \
+    -d \
+    starwarsfan/edomi-docker:latest
 ```
 
 With this configuration the edomi web instance is reachable via URL _http://\<docker-host-ip\>/admin_ or 
@@ -86,9 +110,36 @@ docker run script 'HOSTIP') to your Docker host IP. Otherwise the KNX communicat
 Change http and/or https port to your needs.
 
 **Note 1:**
-It is important to use the option _--net=host_, otherwise the websocket connection for the visu will not work.
-At the moment this may be a drawback, if you need http- a/o https-ports on your Docker host for something else
-than Edomi.
+It is important to map all used ports! According to the example with the default values above, here's a short 
+description:
+ * -p 80:80
+   
+   Mapping of used http port to Edomi http port. 
+ 
+ * -p 8080:8080
+ 
+   Mapping of Websocket port. These values must be the same on both sides of the colon and correspond to the 
+   configuration value on Edomi base configuration.
+   
+ * -p 3671:3671/udp
+ 
+   Mapping of used port for KNX traffic. As this is UDP traffic, it must be finished with "/udp" right after 
+   the internal port, which must correspond to the configuration value on Edomi base configuration.
+   
+ * -p 50000:50000/udp
+ 
+   Mapping of used port for KNX control endpoint. As this is UDP traffic, it must be finished with "/udp" 
+   right after the internal port, which must correspond to the configuration value on Edomi base configuration.
+   
+ * -p 50001:50001/udp
+ 
+   Mapping of used port for KNX data endpoint. As this is UDP traffic, it must be finished with "/udp" 
+   right after the internal port, which must correspond to the configuration value on Edomi base configuration.
+   
+ * -p 22222:22
+ 
+   Mapping of used ssh port to access the container using ssh.
+   
 
 **Note 2:**
 It is important to use the option _--restart=on-failure_ because it is used to handle Edomi shutdown or restart
