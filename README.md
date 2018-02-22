@@ -5,33 +5,8 @@
 
  For more information please refer to [Official website](http://www.edomi.de/) or [Support forum](https://knx-user-forum.de/forum/projektforen/edomi)
 
- This instruction works for a <b>Centos7</b> docker host. Other distributions may need some adjustments.
 
-
-### 1. Install docker
-
-```shell
-sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/7/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
-EOF
-```
-
-```shell
-sudo yum install docker-engine -y
-```
-```shell
-sudo systemctl enable docker.service
-```
-```shell
-sudo systemctl start docker.service
-```
-
-### 2. Build/Use the Edomi Container
+### 1. Build/Use the Edomi Container
 
 You now have two options: 
 - Pull the ready-made image from DockerHub. 
@@ -40,13 +15,13 @@ You now have two options:
 The Edomi archive together with all required packages will be downloaded during docker build. 
 I've added openssh-server and additionally I've set the root password to '123456'.
 
-#### 2a Image from Docker Hub
+#### 1.1 Image from Docker Hub
 
 ```shell
 sudo docker pull starwarsfan/edomi-docker
 ```
 
-#### 2b Build from scratch
+#### 1.2 Build from scratch
 
 The image build is split into two separate build steps. The first step generates updated CentOS 
 base image with all required packages. The second step build the Edomi image, which is based on
@@ -83,7 +58,7 @@ sudo docker build \
 ```
 
 
-### 3. Starting docker container
+### 2. Starting docker container
 
 ```shell
 sudo docker run \
@@ -109,8 +84,9 @@ Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "glob
 docker run script 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
 Change http and/or https port to your needs.
 
-**Note 1:**
-It is important to map all used ports! According to the example with the default values above, here's a short 
+#### 2.1 Explanation of parameters
+
+**It is important to map all used ports!** According to the example with the default values above, here's a short 
 description:
  * -p 80:80
    
@@ -141,13 +117,14 @@ description:
    Mapping of used ssh port to access the container using ssh.
    
 
-**Note 2:**
+**Please note:**
+
 It is important to use the option _--restart=on-failure_ because it is used to handle Edomi shutdown or restart
 from the admin ui. The trick is to exit the container with a non zero exit code in case Edomi should be restartet.
 If it should be shut down, the exit code will be zero, which is not a failure for Docker and so the container
 will not be restartet again.
 
-#### 3.a Mount volume or folder for backups
+### 3. Mount volume or folder for backups
 
 With the additional run parameter _-v <host-folder>:/var/edomi-backups/_ you can mount a folder on the docker 
 host which contains the Edomi backups outside of the container. So the run command may look like the following example:
@@ -166,7 +143,33 @@ sudo systemctl start docker-edomi.service
 sudo systemctl enable docker-edomi.service
 ```
 
-### 5. Useful commands
+### Appendix
+
+#### A Install docker
+
+ This instruction works for a <b>Centos7</b> docker host. Other distributions may need some adjustments.
+
+```shell
+sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/7/
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+EOF
+```
+
+```shell
+sudo yum install docker-engine -y
+```
+```shell
+sudo systemctl enable docker.service
+```
+```shell
+sudo systemctl start docker.service
+```
+#### B Useful commands
 
 Check running / stopped container:
 
