@@ -1,4 +1,4 @@
-## Edomi-Docker (Release 1.55)
+## Edomi-Docker (Release 1.56)
  
  This is a docker implementation for Edomi, a PHP-based smarthome framework.
  It is based on the initial work of [pfischi](https://github.com/pfischi/edomi-docker), thx a lot!
@@ -79,7 +79,7 @@ You can pass a different root passwort to the build and you can pass the Edomi v
 
 ```shell
 sudo docker build \
-    -t starwarsfan/edomi-docker:latest --build-arg ROOT_PASS=Th3Passw0rd --build-arg EDOMI_VERSION=EDOMI-Beta_155.zip .
+    -t starwarsfan/edomi-docker:latest --build-arg ROOT_PASS=Th3Passw0rd --build-arg EDOMI_VERSION=EDOMI-Beta_156.zip .
 ```
 
 
