@@ -2,7 +2,7 @@ FROM starwarsfan/edomi-baseimage:6.8.1
 MAINTAINER Yves Schumann <y.schumann@yetnet.ch>
 
 # Define build arguments
-ARG EDOMI_VERSION=EDOMI-Beta_156.zip
+ARG EDOMI_VERSION=EDOMI-Beta_157.zip
 ARG ROOT_PASS=123456
 
 # Define environment vars
