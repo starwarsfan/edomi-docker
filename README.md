@@ -8,12 +8,12 @@
 
 ### 1. Build/Use the Edomi Container
 
-You now have two options: 
-- Pull the ready-made image from DockerHub. 
-- Build from scratch or 
+You have two options: 
+- Pull the ready-made image from DockerHub or 
+- Build from scratch
 
 The Edomi archive together with all required packages will be downloaded during docker build. 
-I've added openssh-server and additionally I've set the root password to '123456'.
+I've added openssh-server and additionally I've set the root password to '_123456_'.
 
 #### 1.1 Image from Docker Hub
 
@@ -27,14 +27,14 @@ The image build is split into two separate build steps. The first step generates
 base image with all required packages. The second step build the Edomi image, which is based on
 the image from the first build step.
 
-##### Pull Edomi-Docker repos from GitHub
+##### Pull Edomi-Docker Git repos from GitHub
 
 ```shell
 sudo git clone https://github.com/starwarsfan/edomi-baseimage.git
 sudo git clone https://github.com/starwarsfan/edomi-docker.git
 ```
 
-##### Build using Edomi baseimage
+##### Build Edomi baseimage
 
 ```shell
 cd edomi-baseimage
@@ -42,7 +42,7 @@ sudo docker build \
     -t starwarsfan/edomi-baseimage:6.8.1 .
 ```
 
-##### Build using Edomi itself
+##### Build Edomi Docker image itself
 
 ```shell
 cd edomi-docker
@@ -54,7 +54,9 @@ You can pass a different root passwort to the build and you can pass the Edomi v
 
 ```shell
 sudo docker build \
-    -t starwarsfan/edomi-docker:latest --build-arg ROOT_PASS=Th3Passw0rd --build-arg EDOMI_VERSION=EDOMI-Beta_156.zip .
+    -t starwarsfan/edomi-docker:latest \
+    --build-arg ROOT_PASS=Th3Passw0rd \
+    --build-arg EDOMI_VERSION=EDOMI-Beta_156.zip .
 ```
 
 
@@ -81,8 +83,11 @@ With this configuration the edomi web instance is reachable via URL _http://\<do
 _https://\<docker-host-ip\>/admin_ and the commandline via ssh with _ssh -p 22222 \<docker-host-ip\>_.
 With the (optional) parameters KNXGATEWAY, KNXACTIVE and HOSTIP you can pre-configure some settings for Edomi. 
 Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "global_serverIP" in Edomi (or via 
-docker run script 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
+docker run parameter 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
 Change http and/or https port to your needs.
+
+If you use other Edomi modules which communicate using dedicated ports, you need to map them using additional 
+_-p <host-port>:<container-port>_ parameters.
 
 #### 2.1 Explanation of parameters
 
@@ -127,21 +132,13 @@ will not be restartet again.
 ### 3. Mount volume or folder for backups
 
 With the additional run parameter _-v <host-folder>:/var/edomi-backups/_ you can mount a folder on the docker 
-host which contains the Edomi backups outside of the container. So the run command may look like the following example:
+host which contains the Edomi backups outside of the container. So the run command may look like the following 
+example:
 
 ```shell
 sudo docker run --name edomi -v /data/edomi-backups/:/var/edomi-backups/ ...
 ```
 
-
-### 4. Autostart Edomi Docker container
-
-```shell
-sudo cp docker-edomi.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl start docker-edomi.service
-sudo systemctl enable docker-edomi.service
-```
 
 ### Appendix
 
@@ -169,6 +166,7 @@ sudo systemctl enable docker.service
 ```shell
 sudo systemctl start docker.service
 ```
+
 #### B Useful commands
 
 Check running / stopped container:
