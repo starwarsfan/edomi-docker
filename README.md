@@ -1,4 +1,4 @@
-## Edomi-Docker (Release 1.57)
+## Edomi-Docker (Release 1.58)
  
  This is a docker implementation for Edomi, a PHP-based smarthome framework.
  It is based on the initial work of [pfischi](https://github.com/pfischi/edomi-docker), thx a lot!
@@ -129,7 +129,9 @@ from the admin ui. The trick is to exit the container with a non zero exit code 
 If it should be shut down, the exit code will be zero, which is not a failure for Docker and so the container
 will not be restartet again.
 
-### 3. Mount volume or folder for backups
+### 3. Mount external content
+ 
+#### 3.1 Mount volume or folder for backups
 
 With the additional run parameter _-v <host-folder>:/var/edomi-backups/_ you can mount a folder on the docker 
 host which contains the Edomi backups outside of the container. So the run command may look like the following 
@@ -139,6 +141,17 @@ example:
 sudo docker run --name edomi -v /data/edomi-backups/:/var/edomi-backups/ ...
 ```
 
+
+#### 3.2 Mount dedicated files
+
+With the additional run parameter _-v <host-folder>/<filename>:<container-folder>/<filename>_ you can 
+mount a file on the docker host into the Edomi container. This is useful if you use LBS like LBS19000690 
+(Jahrestage), which require access to separate files. So the run command may look like the following 
+example:
+
+```shell
+sudo docker run --name edomi -v /home/edomi/feiertage.csv:/usr/local/edomi/www/visu/feiertage.csv ...
+```
 
 ### Appendix
 
