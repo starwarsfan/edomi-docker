@@ -20,7 +20,7 @@ fi
 # Determine container IP on Docker network
 CONTAINER_IP=$(hostname -i)
 
-if [ -z "$HOSTIP" ]; then 
+if [ -z "$HOSTIP" ]; then
 	echo "HOSTIP not set, using edomi default settings."
 	sed -i -e "s#global_visuIP.*#global_visuIP='$CONTAINER_IP'#" ${EDOMI_CONF}
 else
@@ -31,7 +31,7 @@ else
 	sed -i -e "s/^ServerName.*/ServerName $HOSTIP/g" ${HTTPD_CONF}
 fi
 
-if [ -z "$KNXGATEWAY" ]; then 
+if [ -z "$KNXGATEWAY" ]; then
 	echo "KNXGATEWAY not set, using edomi default settings."
 else
 	echo "KNXGATEWAY set to $KNXGATEWAY ... configure $EDOMI_CONF"
@@ -42,7 +42,7 @@ if [ -z "$KNXACTIVE" ]; then
 	echo "KNXACTIVE not set, using edomi default settings."
 else
 	echo "KNXACTIVE set to $KNXACTIVE ... configure $EDOMI_CONF"
-	sed -i -e "s#global_knxGatewayActive=.*#global_knxGatewayActive='$KNXACTIVE'#" ${EDOMI_CONF}
+	sed -i -e "s#global_knxGatewayActive=.*#global_knxGatewayActive=$KNXACTIVE#" ${EDOMI_CONF}
 fi
 
 service mysqld start
