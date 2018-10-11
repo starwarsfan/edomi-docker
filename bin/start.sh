@@ -20,6 +20,7 @@ fi
 # Determine container IP on Docker network
 CONTAINER_IP=$(hostname -i)
 
+# Set edomi.ini config values based on environment vars given by docker.
 if [ -z "$HOSTIP" ]; then
 	echo "HOSTIP not set, using edomi default settings."
 	sed -i -e "s#global_visuIP.*#global_visuIP='$CONTAINER_IP'#" ${EDOMI_CONF}
@@ -44,6 +45,15 @@ else
 	echo "KNXACTIVE set to $KNXACTIVE ... configure $EDOMI_CONF"
 	sed -i -e "s#global_knxGatewayActive=.*#global_knxGatewayActive=$KNXACTIVE#" ${EDOMI_CONF}
 fi
+
+if [ -z "$WEBSOCKETPORT" ]; then
+	echo "WEBSOCKETPORT not set, using edomi default settings."
+else
+	echo "WEBSOCKETPORT set to $WEBSOCKETPORT ... configure $EDOMI_CONF"
+	sed -i -e "s#global_visuWebsocketPort=.*#global_visuWebsocketPort='$WEBSOCKETPORT'#" ${EDOMI_CONF}
+fi
+
+
 
 service mysqld start
 service vsftpd start
