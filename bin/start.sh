@@ -53,6 +53,10 @@ else
 	sed -i -e "s#global_visuWebsocketPort=.*#global_visuWebsocketPort='$WEBSOCKETPORT'#" ${EDOMI_CONF}
 fi
 
+# set correct timezone based on edomi.ini
+unlink /etc/localtime
+edomiTZ=$(awk -F "=" '/^set_timezone/ {gsub(/[ \047]/, "", $2); print $2}' ${EDOMI_CONF})
+ln -s /usr/share/zoneinfo/${edomiTZ} /etc/localtime
 
 
 service mysqld start
