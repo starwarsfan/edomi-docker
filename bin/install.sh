@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 
-# EDOMI-Hauptpfad (NICHT ÄNDERN!)
+# EDOMI install path (DO NOT CHANGE!)
 MAIN_PATH="/usr/local/edomi"
-
-install_timezone () {
-	# Zeitzone zur Sicherheit auf GMT einstellen
-	rm -f /etc/localtime
-	ln -s /usr/share/zoneinfo/GMT0 /etc/localtime
-}
 
 install_config () {
 	# Firewall
