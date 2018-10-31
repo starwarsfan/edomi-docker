@@ -74,6 +74,7 @@ sudo docker run \
     -p 22222:22 \
     -e KNXGATEWAY=192.168.178.4 \
     -e KNXACTIVE=true \
+	-e WEBSOCKETPORT=8080
     -e HOSTIP=192.168.178.3 \
     -d \
     starwarsfan/edomi-docker:latest
@@ -101,6 +102,8 @@ description:
  
    Mapping of Websocket port. These values must be the same on both sides of the colon and correspond to the 
    configuration value on Edomi base configuration.
+   The "WEBSOCKETPORT" variable will allow to set the websocket port in the edomi configuration.
+   All three values (both sides of the mapping as well as the "WEBSOCKETPORT" value) must match.
    
  * -p 3671:3671/udp
  

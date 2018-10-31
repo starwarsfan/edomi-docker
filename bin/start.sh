@@ -20,7 +20,8 @@ fi
 # Determine container IP on Docker network
 CONTAINER_IP=$(hostname -i)
 
-if [ -z "$HOSTIP" ]; then 
+# Set edomi.ini config values based on environment vars given by docker.
+if [ -z "$HOSTIP" ]; then
 	echo "HOSTIP not set, using edomi default settings."
 	sed -i -e "s#global_visuIP.*#global_visuIP='$CONTAINER_IP'#" ${EDOMI_CONF}
 else
@@ -31,7 +32,7 @@ else
 	sed -i -e "s/^ServerName.*/ServerName $HOSTIP/g" ${HTTPD_CONF}
 fi
 
-if [ -z "$KNXGATEWAY" ]; then 
+if [ -z "$KNXGATEWAY" ]; then
 	echo "KNXGATEWAY not set, using edomi default settings."
 else
 	echo "KNXGATEWAY set to $KNXGATEWAY ... configure $EDOMI_CONF"
@@ -42,22 +43,65 @@ if [ -z "$KNXACTIVE" ]; then
 	echo "KNXACTIVE not set, using edomi default settings."
 else
 	echo "KNXACTIVE set to $KNXACTIVE ... configure $EDOMI_CONF"
-	sed -i -e "s#global_knxGatewayActive=.*#global_knxGatewayActive='$KNXACTIVE'#" ${EDOMI_CONF}
+	sed -i -e "s#global_knxGatewayActive=.*#global_knxGatewayActive=$KNXACTIVE#" ${EDOMI_CONF}
 fi
+
+if [ -z "$WEBSOCKETPORT" ]; then
+	echo "WEBSOCKETPORT not set, using edomi default settings."
+else
+	echo "WEBSOCKETPORT set to $WEBSOCKETPORT ... configure $EDOMI_CONF"
+	sed -i -e "s#global_visuWebsocketPort=.*#global_visuWebsocketPort='$WEBSOCKETPORT'#" ${EDOMI_CONF}
+fi
+
+# set correct timezone based on edomi.ini
+unlink /etc/localtime
+edomiTZ=$(awk -F "=" '/^set_timezone/ {gsub(/[ \047]/, "", $2); print $2}' ${EDOMI_CONF})
+ln -s /usr/share/zoneinfo/${edomiTZ} /etc/localtime
+
 
 service mysqld start
 service vsftpd start
 service httpd start
 service ntpd start
 service sshd start
+
 /usr/local/edomi/main/start.sh &
+
+edomiPID=$!
 
 # Edomi start script is ended either by call of 'reboot' or 'shutdown'.
 # These two files are replaced by helper scripts and their output is
 # evaluated during the next steps.
-#
+
+stop_services()
+{
+    service sshd stop
+    service ntpd stop
+    service httpd stop
+    service vsftpd stop
+    service mysqld stop
+}
+
+
+docker_exit()
+{
+    echo "SIGINT or SIGTERM"
+    php /usr/local/edomi/main/control.php quit
+    echo "wait for edomi shutdown..."
+    wait ${edomiPID}
+    stop_services
+
+    echo "shutdown now..."
+
+    trap - SIGINT SIGTERM
+    exit 0
+}
+
+
+trap docker_exit SIGINT SIGTERM
+
 # But at first wait until Edomi background script is exited.
-wait
+wait ${edomiPID}
 
 # Handle if Edomi restore process is running, which will be sent to background
 # by Edomi main script. So at this point the Edomi start script is finished but
@@ -80,8 +124,12 @@ if [ -e /tmp/doReboot ] ; then
     rm -f /tmp/do*
     # Trigger container restart by simulating an internal error
     # Container must be startet with opeion "--restart=on-failure"
+
+    stop_services
+
     echo "Exiting container with return value 1 to trigger Docker restart"
     exit 1
+
 elif [ -e /tmp/doShutdown ] ; then
 	# Edomi called 'shutdown'
     rm -f /tmp/do*
@@ -89,5 +137,8 @@ fi
 
 # Exit container with 0, so Docker will not restart it
 # Container must be startet with opeion "--restart=on-failure"
+
+stop_services
+
 echo "Exiting container with return value 0 to prevent Docker restarting it"
 exit 0
