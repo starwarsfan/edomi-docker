@@ -64,14 +64,44 @@ service vsftpd start
 service httpd start
 service ntpd start
 service sshd start
+
 /usr/local/edomi/main/start.sh &
+
+edomiPID=$!
 
 # Edomi start script is ended either by call of 'reboot' or 'shutdown'.
 # These two files are replaced by helper scripts and their output is
 # evaluated during the next steps.
-#
+
+stop_services()
+{
+    service sshd stop
+    service ntpd stop
+    service httpd stop
+    service vsftpd stop
+    service mysqld stop
+}
+
+
+docker_exit()
+{
+    echo "SIGINT or SIGTERM"
+    php /usr/local/edomi/main/control.php quit
+    echo "wait for edomi shutdown..."
+    wait ${edomiPID}
+    stop_services
+
+    echo "shutdown now..."
+
+    trap - SIGINT SIGTERM
+    exit 0
+}
+
+
+trap docker_exit SIGINT SIGTERM
+
 # But at first wait until Edomi background script is exited.
-wait
+wait ${edomiPID}
 
 # Handle if Edomi restore process is running, which will be sent to background
 # by Edomi main script. So at this point the Edomi start script is finished but
@@ -94,8 +124,12 @@ if [ -e /tmp/doReboot ] ; then
     rm -f /tmp/do*
     # Trigger container restart by simulating an internal error
     # Container must be startet with opeion "--restart=on-failure"
+
+    stop_services
+
     echo "Exiting container with return value 1 to trigger Docker restart"
     exit 1
+
 elif [ -e /tmp/doShutdown ] ; then
 	# Edomi called 'shutdown'
     rm -f /tmp/do*
@@ -103,5 +137,8 @@ fi
 
 # Exit container with 0, so Docker will not restart it
 # Container must be startet with opeion "--restart=on-failure"
+
+stop_services
+
 echo "Exiting container with return value 0 to prevent Docker restarting it"
 exit 0
