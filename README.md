@@ -134,14 +134,53 @@ will not be restartet again.
 
 ### 3. Mount external content
 
+The image offers three mountpoints:
+
+* /var/edomi-backups
+* /var/lib/mysql
+* /usr/local/edomi
+
+So it is possible to use dedicated volumes, which enables the possibility to reuse the volumes on a new container.
+
 #### 3.1 Mount volume or folder for backups
 
-With the additional run parameter _-v <host-folder>:/var/edomi-backups/_ you can mount a folder on the docker
-host which contains the Edomi backups outside of the container. So the run command may look like the following
-example:
+With the additional run parameter _-v <host-folder>:<mountpoint>_ or _-v <volume>:<mountpoint>_ you can mount a 
+folder from the Docker host or a Docker volume into the container.
+
+The usage of volumes should be preferred, as this offers the most flexibility. To do so, at first you should 
+create empty volumes:
 
 ```shell
-sudo docker run --name edomi -v /data/edomi-backups/:/var/edomi-backups/ ...
+sudo docker volume create edomi-backups
+sudo docker volume create edomi-db
+sudo docker volume create edomi-installation
+```
+
+Now the container can be started using these volumes:
+
+```shell
+sudo docker run \
+    --name edomi \
+    -v edomi-backups:/var/edomi-backups \
+    -v edomi-db:var/lib/mysql \
+    -v edomi-installation:/usr/local/edomi \
+    ...
+```
+
+If a new container is created using _empty_ volumes, then the content which is already existing on the used 
+location inside the used Docker image is copied onto the volume. So if you _docker run_ a new Edomi instance,
+the whole content from these three mountpoint directories will be copied to the used volumes. So if the container
+instance is destroyed and the volumes where used on a new Edomi instance, the content from the previous instance
+will be there.
+
+The usage of a directory from the Docker host instead of a volume is similar in it's usage. You need to use
+the full path to the folder on the left side of the colon:
+
+```shell
+sudo docker run \
+    --name edomi \
+    -v /data/edomi-backups/:/var/edomi-backups/ \
+    ...
 ```
 
 
