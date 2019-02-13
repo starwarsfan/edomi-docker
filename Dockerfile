@@ -11,10 +11,14 @@ ENV EDOMI_VERSION=${EDOMI_VERSION} \
     EDOMI_INSTALL_PATH=/tmp/edomi/Install/ \
     START_SCRIPT=/root/start.sh \
     ROOT_PASS=${ROOT_PASS} \
-    EDOMI_BACKUP_DIR=/var/edomi-backups
+    EDOMI_BACKUP_DIR=/var/edomi-backups \
+    EDOMI_DB_DIR=/var/lib/mysql \
+    EDOMI_INSTALL_DIR=/usr/local/edomi
 
-# Mount point for Edomi backups
+# Mount points
 VOLUME ${EDOMI_BACKUP_DIR}
+VOLUME ${EDOMI_DB_DIR}
+VOLUME ${EDOMI_INSTALL_DIR}
 
 # Set root passwd and rename 'reboot' and 'shutdown' commands
 RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root) \
