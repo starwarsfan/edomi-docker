@@ -1,4 +1,4 @@
-FROM starwarsfan/edomi-baseimage:6.8.1
+FROM starwarsfan/edomi-baseimage:6.8.2
 MAINTAINER Yves Schumann <y.schumann@yetnet.ch>
 
 # Define build arguments
@@ -19,6 +19,12 @@ ENV EDOMI_VERSION=${EDOMI_VERSION} \
 VOLUME ${EDOMI_BACKUP_DIR}
 VOLUME ${EDOMI_DB_DIR}
 VOLUME ${EDOMI_INSTALL_DIR}
+
+# Prepare helper script to fix update error from 1.62 to 1.63
+RUN mkdir -p /root/patch_1.62
+COPY root/patch_1.62.sh /root/
+COPY root/patch_1.62/cmd1.php /root/patch_1.62/
+RUN chmod +x /root/patch_1.62.sh
 
 # Set root passwd and rename 'reboot' and 'shutdown' commands
 RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root) \
