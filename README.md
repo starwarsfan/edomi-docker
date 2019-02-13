@@ -39,10 +39,21 @@ sudo git clone https://github.com/starwarsfan/edomi-docker.git
 ```shell
 cd edomi-baseimage
 sudo docker build \
-    -t starwarsfan/edomi-baseimage:6.8.1 .
+    -t starwarsfan/edomi-baseimage:latest .
 ```
 
 ##### Build Edomi Docker image itself
+
+If you built an own Edomi-Baseimage (the step before), you need to update it's reference
+on the first line of the Dockerfile. The default first line looks like the following snippet,
+where the version should be replaced with `latest`, if you build your personal base image
+with `latest` as version:
+
+```shell
+FROM starwarsfan/edomi-baseimage:6.8.2
+```
+
+Afterwards you can trigger the build with:
 
 ```shell
 cd edomi-docker
@@ -74,7 +85,7 @@ sudo docker run \
     -p 22222:22 \
     -e KNXGATEWAY=192.168.178.4 \
     -e KNXACTIVE=true \
-	-e WEBSOCKETPORT=8080
+    -e WEBSOCKETPORT=8080 \
     -e HOSTIP=192.168.178.3 \
     -d \
     starwarsfan/edomi-docker:latest
@@ -144,10 +155,10 @@ So it is possible to use dedicated volumes, which enables the possibility to reu
 
 #### 3.1 Mount volume or folder for backups
 
-With the additional run parameter _-v <host-folder>:<mountpoint>_ or _-v <volume>:<mountpoint>_ you can mount a 
+With the additional run parameter _-v <host-folder>:<mountpoint>_ or _-v <volume>:<mountpoint>_ you can mount a
 folder from the Docker host or a Docker volume into the container.
 
-The usage of volumes should be preferred, as this offers the most flexibility. To do so, at first you should 
+The usage of volumes should be preferred, as this offers the most flexibility. To do so, at first you should
 create empty volumes:
 
 ```shell
@@ -167,7 +178,7 @@ sudo docker run \
     ...
 ```
 
-If a new container is created using _empty_ volumes, then the content which is already existing on the used 
+If a new container is created using _empty_ volumes, then the content which is already existing on the used
 location inside the used Docker image is copied onto the volume. So if you _docker run_ a new Edomi instance,
 the whole content from these three mountpoint directories will be copied to the used volumes. So if the container
 instance is destroyed and the volumes where used on a new Edomi instance, the content from the previous instance
