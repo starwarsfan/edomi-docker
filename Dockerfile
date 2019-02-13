@@ -16,9 +16,7 @@ ENV EDOMI_VERSION=${EDOMI_VERSION} \
     EDOMI_INSTALL_DIR=/usr/local/edomi
 
 # Mount points
-VOLUME ${EDOMI_BACKUP_DIR}
-VOLUME ${EDOMI_DB_DIR}
-VOLUME ${EDOMI_INSTALL_DIR}
+VOLUME ${EDOMI_BACKUP_DIR} ${EDOMI_DB_DIR} ${EDOMI_INSTALL_DIR}
 
 # Prepare helper script to fix update error from 1.62 to 1.63
 RUN mkdir -p /root/patch_1.62
