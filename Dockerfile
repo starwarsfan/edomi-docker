@@ -15,9 +15,6 @@ ENV EDOMI_VERSION=${EDOMI_VERSION} \
     EDOMI_DB_DIR=/var/lib/mysql \
     EDOMI_INSTALL_DIR=/usr/local/edomi
 
-# Mount points
-VOLUME ${EDOMI_BACKUP_DIR} ${EDOMI_DB_DIR} ${EDOMI_INSTALL_DIR}
-
 # Prepare helper script to fix update error from 1.62 to 1.63
 RUN mkdir -p /root/patch_1.62
 COPY root/patch_1.62.sh /root/
@@ -49,5 +46,8 @@ RUN cd ${EDOMI_INSTALL_PATH} \
 # Enable ssl for edomi
 RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
            -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf
+
+# Mount points
+VOLUME ${EDOMI_BACKUP_DIR} ${EDOMI_DB_DIR} ${EDOMI_INSTALL_DIR}
 
 CMD ["/root/start.sh"]
