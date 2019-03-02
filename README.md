@@ -39,7 +39,7 @@ sudo git clone https://github.com/starwarsfan/edomi-docker.git
 ```shell
 cd edomi-baseimage
 sudo docker build \
-    -t starwarsfan/edomi-baseimage:latest .
+    -t starwarsfan/edomi-baseimage:latest-centos6 .
 ```
 
 ##### Build Edomi Docker image itself
@@ -58,14 +58,14 @@ Afterwards you can trigger the build with:
 ```shell
 cd edomi-docker
 sudo docker build \
-    -t starwarsfan/edomi-docker:latest .
+    -t starwarsfan/edomi-docker:latest-centos6 .
 ```
 
 You can pass a different root passwort to the build and you can pass the Edomi version to download too:
 
 ```shell
 sudo docker build \
-    -t starwarsfan/edomi-docker:latest \
+    -t starwarsfan/edomi-docker:latest-centos6 \
     --build-arg ROOT_PASS=Th3Passw0rd \
     --build-arg EDOMI_VERSION=EDOMI-Beta_156.zip .
 ```
@@ -88,7 +88,7 @@ sudo docker run \
     -e WEBSOCKETPORT=8080 \
     -e HOSTIP=192.168.178.3 \
     -d \
-    starwarsfan/edomi-docker:latest
+    starwarsfan/edomi-docker:latest-centos6
 ```
 
 With this configuration the edomi web instance is reachable via URL _http://\<docker-host-ip\>/admin_ or
@@ -208,7 +208,7 @@ sudo docker run --name edomi -v /home/edomi/feiertage.csv:/usr/local/edomi/www/v
 
 ### Appendix
 
-#### A Install docker
+#### A: Install docker
 
  This instruction works for a <b>Centos7</b> docker host. Other distributions may need some adjustments.
 
@@ -233,7 +233,7 @@ sudo systemctl enable docker.service
 sudo systemctl start docker.service
 ```
 
-#### B Useful commands
+#### B: Useful commands
 
 Check running / stopped container:
 
@@ -265,7 +265,7 @@ Open cmdline inside of container
 sudo docker exec -i -t edomi /bin/bash
 ```
 
-#### C Update from 1.62 to 1.63
+#### C: Update from 1.62 to 1.63
 
 The following steps can be used if you're facing issues during the update from version 1.62 to 1.63.
 
@@ -283,7 +283,7 @@ causes the update failure. Here are the steps to do:
 
 ##### Fix using cmdline inside the container
 
-These variant could be used if you're running the Edomi container on a management tool like 
+These variant could be used if you're running the Edomi container on a management tool like
 [Portainer](https://www.portainer.io/). To do so, perform these steps:
 
 * Pause (not stop!) Edomi using the Edomi Admin-UI
