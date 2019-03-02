@@ -1,4 +1,4 @@
-FROM starwarsfan/edomi-baseimage:6.8.2
+FROM starwarsfan/edomi-baseimage:7
 MAINTAINER Yves Schumann <y.schumann@yetnet.ch>
 
 # Define build arguments
