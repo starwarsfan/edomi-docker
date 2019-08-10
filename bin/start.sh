@@ -59,11 +59,11 @@ edomiTZ=$(awk -F "=" '/^set_timezone/ {gsub(/[ \047]/, "", $2); print $2}' ${EDO
 ln -s /usr/share/zoneinfo/${edomiTZ} /etc/localtime
 
 
-service mysqld start
-service vsftpd start
-service httpd start
-service ntpd start
-service sshd start
+systemctl start mysqld
+systemctl start vsftpd
+systemctl start httpd
+systemctl start ntpd
+systemctl start sshd
 
 /usr/local/edomi/main/start.sh &
 
@@ -75,11 +75,11 @@ edomiPID=$!
 
 stop_services()
 {
-    service sshd stop
-    service ntpd stop
-    service httpd stop
-    service vsftpd stop
-    service mysqld stop
+    systemctl stop sshd
+    systemctl stop ntpd
+    systemctl stop httpd
+    systemctl stop vsftpd
+    systemctl stop mysqld
 }
 
 
