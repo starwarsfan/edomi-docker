@@ -43,8 +43,8 @@ RUN cd ${EDOMI_EXTRACT_PATH} \
  && ./install.sh
 
 # Enable ssl for edomi
-#RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
-#           -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf
+RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
+           -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf
 
 # Mount points
 VOLUME ${EDOMI_BACKUP_DIR} ${EDOMI_DB_DIR} ${EDOMI_INSTALL_DIR}
