@@ -1,9 +1,8 @@
 ## Edomi-Docker
 
- This is a docker implementation for Edomi, a PHP-based smarthome framework.
- It is based on the initial work of [pfischi](https://github.com/pfischi/edomi-docker), thx a lot!
+This is a Docker implementation for Edomi, a PHP-based smarthome framework.
 
- For more information please refer to [Official website](http://www.edomi.de/) or [Support forum](https://knx-user-forum.de/forum/projektforen/edomi)
+For more information please refer to [Official website](http://www.edomi.de/) or [Support forum](https://knx-user-forum.de/forum/projektforen/edomi)
 
 
 ### 1. Build/Use the Edomi Container
@@ -173,7 +172,7 @@ Now the container can be started using these volumes:
 sudo docker run \
     --name edomi \
     -v edomi-backups:/var/edomi-backups \
-    -v edomi-db:var/lib/mysql \
+    -v edomi-db:/var/lib/mysql \
     -v edomi-installation:/usr/local/edomi \
     ...
 ```
