@@ -71,6 +71,11 @@ install_edomi () {
 		tar -xvf edomi.edomiinstall -C ${MAIN_PATH}
 		chmod 777 -R ${MAIN_PATH}
 	fi
+
+	sed -i \
+	    -e "s/service\(.*\)start/systemctl start\1/g" \
+	    -e "s/service\(.*\)stop/systemctl stop\1/g" \
+	    /usr/local/edomi/main/start.sh
 }
 
 show_title () {
