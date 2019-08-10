@@ -3,41 +3,64 @@
 # EDOMI install path (DO NOT CHANGE!)
 MAIN_PATH="/usr/local/edomi"
 
-install_config () {
-	# Firewall
-	cp config/config /etc/selinux/
-	
-	# Apache
-	cp config/welcome.conf /etc/httpd/conf.d/
-	cp config/httpd.conf /etc/httpd/conf/
-	sed -i -e "s#===INSTALL-HTTP-ROOT===#$MAIN_PATH/www#g" /etc/httpd/conf/httpd.conf
+configureEnvironment () {
+    mkdir -p /etc/selinux/targeted/contexts/
+    echo '<busconfig><selinux></selinux></busconfig>' > /etc/selinux/targeted/contexts/dbus_contexts
 
-	# PHP
-	cp config/php.conf /etc/httpd/conf.d/
-	cp config/php.ini /etc/
-	
-	# mySQL
-	cp config/my.cnf /etc/
-	
-	# FTP
-	cp config/vsftpd.conf /etc/vsftpd/
+	# -------------------------------
+	echo -e "\033[32m>>> FTP konfigurieren\033[39m"
 	rm -f /etc/vsftpd/ftpusers
 	rm -f /etc/vsftpd/user_list
-}
+	sed -i -e '/listen=/ s/=.*/=YES/' /etc/vsftpd/vsftpd.conf
+	sed -i -e '/listen_ipv6=/ s/=.*/=NO/' /etc/vsftpd/vsftpd.conf
+	sed -i -e '/userlist_enable=/ s/=.*/=NO/' /etc/vsftpd/vsftpd.conf
 
-install_mysql () {
-	service mysqld start
+	# -------------------------------
+	echo -e "\033[32m>>> Apache konfigurieren\033[39m"
+	sed -i -e "s/#ServerName www\.example\.com/ServerName $SERVERIP/" /etc/httpd/conf/httpd.conf
+	sed -i -e "s#DocumentRoot \"/var/www/html\"#DocumentRoot \"$MAIN_PATH/www\"#" /etc/httpd/conf/httpd.conf
+	sed -i -e "s#<Directory \"/var/www\">#<Directory \"$MAIN_PATH/www\">#" /etc/httpd/conf/httpd.conf
+	sed -i -e "s#<Directory \"/var/www/html\">#<Directory \"$MAIN_PATH/www\">#" /etc/httpd/conf/httpd.conf
+
+	# -------------------------------
+	echo -e "\033[32m>>> mySQL/MariaDB konfigurieren\033[39m"
+	systemctl start mariadb
 	/usr/bin/mysqladmin -u root password ""
 	mysql -e "DROP DATABASE test;"
 	mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'"
 	mysql -e "FLUSH PRIVILEGES;"
-	
-	# Remote-Access aktivieren (z.B. vom iMac aus)
-	# mysql -e "GRANT ALL ON *.* TO mysql@'%';"
+	mysql -e "GRANT ALL ON *.* TO mysql@'%';"
+
+	echo "key_buffer_size=256M" 			> /tmp/tmp.txt
+	echo "sort_buffer_size=8M" 				>> /tmp/tmp.txt
+	echo "read_buffer_size=16M" 			>> /tmp/tmp.txt
+	echo "read_rnd_buffer_size=4M" 			>> /tmp/tmp.txt
+	echo "myisam_sort_buffer_size=4M" 		>> /tmp/tmp.txt
+	echo "join_buffer_size=4M" 				>> /tmp/tmp.txt
+	echo "query_cache_limit=8M" 			>> /tmp/tmp.txt
+	echo "query_cache_size=8M" 				>> /tmp/tmp.txt
+	echo "query_cache_type=1" 				>> /tmp/tmp.txt
+	echo "wait_timeout=28800" 				>> /tmp/tmp.txt
+	echo "interactive_timeout=28800" 		>> /tmp/tmp.txt
+	sed -i '/\[mysqld\]/r /tmp/tmp.txt' /etc/my.cnf
+
+	# mySQL-Symlink erstellen
+	echo "Alias=mysqld.service" 			> /tmp/tmp.txt
+	sed -i '/\[Install\]/r /tmp/tmp.txt' /usr/lib/systemd/system/mariadb.service
+	ln -s '/usr/lib/systemd/system/mariadb.service' '/etc/systemd/system/mysqld.service'
+	systemctl daemon-reload
+
+	# -------------------------------
+	echo -e "\033[32m>>> PHP konfigurieren\033[39m"
+	sed -i -e '/short_open_tag =/ s/=.*/= On/' /etc/php.ini
+	sed -i -e '/post_max_size =/ s/=.*/= 100M/' /etc/php.ini
+	sed -i -e '/upload_max_filesize =/ s/=.*/= 100M/' /etc/php.ini
+	sed -i -e '/max_file_uploads =/ s/=.*/= 1000/' /etc/php.ini
 }
 
 install_edomi () {
-	service mysqld stop
+	echo -e "\033[32m>>> EDOMI installieren\033[39m"
+	systemctl stop mariadb
 	sleep 1
 
 	if [ -f "EDOMI/EDOMI-Backup.edomibackup" ] ; then
@@ -45,49 +68,32 @@ install_edomi () {
 		chmod 777 -R ${MAIN_PATH}
 	else
 		mkdir -p ${MAIN_PATH}
-		tar -xf EDOMI/EDOMI-Public.edomiinstall -C ${MAIN_PATH} --strip-components=3
+		tar -xvf edomi.edomiinstall -C ${MAIN_PATH}
 		chmod 777 -R ${MAIN_PATH}
 	fi
 }
 
-
-install_extensions () {
-	cp php/bcompiler.so /usr/lib64/php/modules/bcompiler.so
-	cp php/bcompiler.ini /etc/php.d/bcompiler.ini
+show_title () {
+	echo -e "\033[42m\033[30m                                                                                \033[49m\033[39m"
+	echo -e "\033[42m\033[30m                       EDOMI - (c) Dr. Christian Gärtner                        \033[49m\033[39m"
+	echo -e "\033[42m\033[30m                                                                                \033[49m\033[39m"
 }
 
 show_splash () {
-	echo -e "\033[32m"
-	echo "--------------------------------------------------------------------------------"
-	echo "                                                                                "
-	echo "        OOOOOOOOOOO  OOOOOOOO        OOOOOOOOO        OOOOOOOOOOOOOO  O         "
-	echo "        O            O       OO    OO         OO    OO     O       O  O         "
-	echo "        O            O         O  O             O  O       O       O  O         "
-	echo "        OOOOOOOO     O         O  O             O  O       O       O  O         "
-	echo "        O            O         O  O             O  O       O       O  O         "
-	echo "        O            O       OO    OO         OO   O       O       O  O         "
-	echo "        OOOOOOOOOOO  OOOOOOOO        OOOOOOOOO     O       O       O  O         "
-	echo "                                                                                "
-	echo "        EDOMI-Installation abgeschlossen      (c) Dr. Christian Gärtner         "
-	echo "                                                                                "
-	echo "--------------------------------------------------------------------------------"
-	echo -e "\033[39m"
+	show_title
+	echo -e "\033[32mDie EDOMI-Installation ist abgeschlossen.\033[39m"
+	echo -e "\033[32mBeim nächsten Systemstart wird EDOMI automatisch gestartet.\033[39m"
+	echo -e "\033[32mNeustart mit: reboot (ENTER)\033[39m"
+	echo ""
 }
 
 # Installationsscript
 
 osversion="$(cat /etc/issue)"
 clear
-echo "================================================================================"
-echo "                                                                                "
-echo "                       EDOMI - (c) Dr. Christian Gärtner                        "
-echo "                                                                                "
-echo "================================================================================"
-echo ""
+show_title
 
-install_config
-install_mysql
+configureEnvironment
 install_edomi
-install_extensions
 show_splash
 exit
