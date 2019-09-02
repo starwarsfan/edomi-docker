@@ -36,9 +36,10 @@ RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown /sbin/service
 RUN cd ${EDOMI_EXTRACT_PATH} \
  && ./install.sh
 
-# Enable ssl for edomi
+# Enable ssl for edomi and disable chmod for not existing /dev/vcsa
 RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
-           -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf
+           -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf \
+ && sed -i "s/^\(.*vcsa\)/#\1/g" /usr/local/edomi/main/start.sh
 
 # Mount points
 VOLUME ${EDOMI_BACKUP_DIR} ${EDOMI_DB_DIR} ${EDOMI_INSTALL_DIR}
