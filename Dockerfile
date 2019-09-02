@@ -30,7 +30,7 @@ COPY bin/start.sh ${START_SCRIPT}
 COPY sbin/reboot sbin/shutdown sbin/service /sbin/
 
 # Make scripts executable
-RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown
+RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown /sbin/service
 
 # Install Edomi
 RUN cd ${EDOMI_EXTRACT_PATH} \
