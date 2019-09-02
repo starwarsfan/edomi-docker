@@ -27,7 +27,7 @@ RUN mkdir ${EDOMI_EXTRACT_PATH} \
 # Copy script into image
 COPY bin/install.sh ${EDOMI_EXTRACT_PATH}
 COPY bin/start.sh ${START_SCRIPT}
-COPY sbin/reboot sbin/shutdown /sbin/
+COPY sbin/reboot sbin/shutdown sbin/service /sbin/
 
 # Make scripts executable
 RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown

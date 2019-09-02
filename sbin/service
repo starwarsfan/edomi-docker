@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Helper script to handle Edomi initiated system reboot out of Docker
-# container.
+# Helper script to map calls to 'service' on CentOS7 to 'systemctl', as
+# 'service' is not available there.
 # See https://knx-user-forum.de/forum/projektforen/edomi
-# 2017-09-16 Y. Schumann (starwarsfan)
+# 2019-09-02 Y. Schumann (starwarsfan)
 # ============================================================================
-touch /tmp/doReboot
+systemctl "$2" "$1"
