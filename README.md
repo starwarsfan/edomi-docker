@@ -205,6 +205,14 @@ example:
 sudo docker run --name edomi -v /home/edomi/feiertage.csv:/usr/local/edomi/www/visu/feiertage.csv ...
 ```
 
+#### 4 Migrate from Edomi 1.x (CentOS 6 Container) to 2.x with CentOS 7 Container
+
+* Backup current Edomi instance using `Verwaltung > Datensicherung > Backup herunterladen`
+* Create volumes to store data, see 3.1 above
+* Start new container using created volumes
+* Copy downloaded backup to created backup-volume
+* Import backup using `Verwaltung > Datensicherung > Wiederherstellung`
+
 ### Appendix
 
 #### A: Install docker
