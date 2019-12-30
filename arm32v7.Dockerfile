@@ -1,4 +1,4 @@
-FROM starwarsfan/edomi-baseimage:amd64-latest
+FROM starwarsfan/edomi-baseimage:arm32v7-latest
 MAINTAINER Yves Schumann <y.schumann@yetnet.ch>
 
 # Define build arguments
