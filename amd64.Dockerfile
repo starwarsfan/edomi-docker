@@ -20,17 +20,17 @@ RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root) \
  && mv /sbin/shutdown /sbin/shutdown_ \
  && mv /sbin/reboot /sbin/reboot_
 
+# Replace 'reboot' and 'shutdown' with own handler scripts
+COPY bin/start.sh ${START_SCRIPT}
+COPY sbin/reboot sbin/shutdown sbin/service /sbin/
+RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown /sbin/service
+
 ADD http://edomi.de/download/install/${EDOMI_VERSION} ${EDOMI_ARCHIVE}
 RUN mkdir ${EDOMI_EXTRACT_PATH} \
  && tar -xf ${EDOMI_ARCHIVE} -C ${EDOMI_EXTRACT_PATH}
 
-# Copy script into image
+# Copy modified install script into image
 COPY bin/install.sh ${EDOMI_EXTRACT_PATH}
-COPY bin/start.sh ${START_SCRIPT}
-COPY sbin/reboot sbin/shutdown sbin/service /sbin/
-
-# Make scripts executable
-RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown /sbin/service
 
 # Install Edomi
 RUN cd ${EDOMI_EXTRACT_PATH} \

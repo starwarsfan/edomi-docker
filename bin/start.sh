@@ -21,9 +21,6 @@ chown -R root:root /root/.ssh
 /usr/bin/echo "\"ssh -i \${savedkey} root@\${ipaddress}\""
 /usr/bin/echo ""
 
-# Now start ssh.
-/usr/sbin/sshd
-
 ### Edomi ####################################################################
 # These are ENV VARs on docker run
 
