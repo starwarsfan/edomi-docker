@@ -21,6 +21,11 @@ chown -R root:root /root/.ssh
 /usr/bin/echo "\"ssh -i \${savedkey} root@\${ipaddress}\""
 /usr/bin/echo ""
 
+### Dynamically set root password ############################################
+if [[ -n "${ROOT_PASS}" ]] ; then
+    echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root)
+fi
+
 ### Edomi ####################################################################
 # These are ENV VARs on docker run
 

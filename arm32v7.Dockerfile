@@ -44,4 +44,7 @@ RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
 # Mount points
 VOLUME ${EDOMI_BACKUP_DIR} ${EDOMI_DB_DIR} ${EDOMI_INSTALL_DIR}
 
+# Clear default root pass env var
+ENV ROOT_PASS=''
+
 CMD ["/root/start.sh"]
