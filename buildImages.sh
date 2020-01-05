@@ -42,6 +42,6 @@ fi
 
 docker build -f arm32v7.Dockerfile -t starwarsfan/edomi-docker:arm32v7-latest .
 if ${PUBLISH_IMAGE} ; then
-    echo "Unsupported at the moment :-/"
+    echo "ARMv7 unsupported at the moment, no push to DockerHub :-/"
 #    docker push starwarsfan/edomi-docker:arm32v7-latest
 fi
