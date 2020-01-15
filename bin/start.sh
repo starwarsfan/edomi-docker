@@ -80,6 +80,9 @@ else
 	sed -i -e "s#global_visuWebsocketPort=.*#global_visuWebsocketPort='$WEBSOCKETPORT'#" ${EDOMI_CONF}
 fi
 
+echo "Disabling heartbeat log output every second ... configure $EDOMI_CONF"
+sed -i -e "s#global_serverConsoleInterval=.*#global_serverConsoleInterval=false#" ${EDOMI_CONF}
+
 # set correct timezone based on edomi.ini
 unlink /etc/localtime
 edomiTZ=$(awk -F "=" '/^set_timezone/ {gsub(/[ \047]/, "", $2); print $2}' ${EDOMI_CONF})
