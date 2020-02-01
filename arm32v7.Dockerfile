@@ -2,7 +2,7 @@ FROM starwarsfan/edomi-baseimage:arm32v7-latest
 MAINTAINER Yves Schumann <y.schumann@yetnet.ch>
 
 # Define build arguments
-ARG EDOMI_VERSION=EDOMI_200.tar
+ARG EDOMI_VERSION=EDOMI_201.tar
 ARG ROOT_PASS=123456
 
 # Define environment vars
