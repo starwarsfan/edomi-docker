@@ -88,6 +88,8 @@ unlink /etc/localtime
 edomiTZ=$(awk -F "=" '/^set_timezone/ {gsub(/[ \047]/, "", $2); print $2}' ${EDOMI_CONF})
 ln -s /usr/share/zoneinfo/${edomiTZ} /etc/localtime
 
+# Cleanup potential leftovers
+rm -rf /run/httpd/httpd.pid
 
 systemctl start mysqld
 systemctl start vsftpd
