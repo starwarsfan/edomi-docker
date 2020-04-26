@@ -41,6 +41,9 @@ RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
            -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf \
  && sed -i "s/^\(.*vcsa\)/#\1/g" /usr/local/edomi/main/start.sh
 
+# Enable lib_mysqludf_sys
+RUN mysql -u root mysql < /root/lib_mysqludf_sys.sql
+
 # Mount points
 VOLUME ${EDOMI_BACKUP_DIR} ${EDOMI_DB_DIR} ${EDOMI_INSTALL_DIR}
 
