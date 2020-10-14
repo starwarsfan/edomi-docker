@@ -43,6 +43,11 @@ if ${PUBLISH_IMAGE} ; then
     docker push starwarsfan/edomi-docker:amd64-latest
 fi
 
+docker build -f arm64v8.Dockerfile -t starwarsfan/edomi-docker:arm64v8-latest .
+if ${PUBLISH_IMAGE} ; then
+    docker push starwarsfan/edomi-docker:arm64v8-latest
+fi
+
 if ${BUILD_ARM_IMAGES} ; then
     docker build -f arm32v7.Dockerfile -t starwarsfan/edomi-docker:arm32v7-latest .
     if ${PUBLISH_IMAGE} ; then
