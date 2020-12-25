@@ -89,7 +89,7 @@ edomiTZ=$(awk -F "=" '/^set_timezone/ {gsub(/[ \047]/, "", $2); print $2}' ${EDO
 ln -s /usr/share/zoneinfo/${edomiTZ} /etc/localtime
 
 # Cleanup potential leftovers
-rm -rf /run/httpd/httpd.pid
+rm -rf /run/httpd/*
 
 systemctl start mysqld
 systemctl start vsftpd
