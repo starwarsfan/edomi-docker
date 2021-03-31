@@ -39,7 +39,10 @@ RUN cd ${EDOMI_EXTRACT_PATH} \
 # Enable ssl for edomi and disable chmod for not existing /dev/vcsa
 RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
            -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf \
- && sed -i "s/^\(.*vcsa\)/#\1/g" /usr/local/edomi/main/start.sh
+ && sed -i -e "s/^\(.*vcsa\)/#\1/g" \
+           -e "s/\(service mysqld stop\)/#\1/g" \
+           -e "s@\(rm -f \$MYSQL_PATH/mysql.sock\)@#\1@g" \
+           -e "s/\(service mysqld start\)/#\1/g" /usr/local/edomi/main/start.sh
 
 # Enable lib_mysqludf_sys
 RUN systemctl start mariadb \
