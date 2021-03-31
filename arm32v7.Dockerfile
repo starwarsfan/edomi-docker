@@ -46,7 +46,7 @@ RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
 
 # Enable lib_mysqludf_sys
 RUN systemctl start mariadb \
- && mysql -u root mysql < /root/lib_mysqludf_sys.sql \
+ && mysql -u root mysql < /root/installdb.sql \
  && systemctl stop mariadb
 
 # Mount points
