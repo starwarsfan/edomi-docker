@@ -88,6 +88,14 @@ unlink /etc/localtime
 edomiTZ=$(awk -F "=" '/^set_timezone/ {gsub(/[ \047]/, "", $2); print $2}' ${EDOMI_CONF})
 ln -s /usr/share/zoneinfo/${edomiTZ} /etc/localtime
 
+# Disable chmod for not existing /dev/vcsa
+# Disable removal of mysql.sock
+# Must be done on each start as start.sh might be replaced by an Edomi update!
+sed -i -e "s@\(.*\)\(chmod 777 /dev/vcsa\)@#\2@g" \
+       -e "s@\(.*\)\(service mysqld stop\)@#\2@g" \
+       -e "s@\(.*\)\(rm -f \$MYSQL_PATH/mysql.sock\)@#\2@g" \
+       -e "s@\(.*\)\(service mysqld start\)@#\2@g" /usr/local/edomi/main/start.sh
+
 # Cleanup potential leftovers
 rm -rf /run/httpd/*
 

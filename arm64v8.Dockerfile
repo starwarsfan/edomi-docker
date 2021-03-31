@@ -36,7 +36,9 @@ COPY bin/install.sh ${EDOMI_EXTRACT_PATH}
 RUN cd ${EDOMI_EXTRACT_PATH} \
  && ./install.sh
 
-# Enable ssl for edomi and disable chmod for not existing /dev/vcsa
+# Enable ssl for edomi
+# Disable chmod for not existing /dev/vcsa
+# Disable removal of mysql.sock
 RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
            -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf \
  && sed -i -e "s/^\(.*vcsa\)/#\1/g" \
