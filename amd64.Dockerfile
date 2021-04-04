@@ -25,9 +25,9 @@ COPY bin/start.sh ${START_SCRIPT}
 COPY sbin/reboot sbin/shutdown sbin/service /sbin/
 RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown /sbin/service
 
-ADD http://edomi.de/download/install/${EDOMI_VERSION} ${EDOMI_ARCHIVE}
 RUN mkdir ${EDOMI_EXTRACT_PATH} \
- && tar -xf ${EDOMI_ARCHIVE} -C ${EDOMI_EXTRACT_PATH}
+ && cd ${EDOMI_EXTRACT_PATH} \
+ && wget -c http://edomi.de/download/install/${EDOMI_VERSION} -O - | tar -x edomi.edomiinstall
 
 # Copy modified install script into image
 COPY bin/install.sh ${EDOMI_EXTRACT_PATH}
