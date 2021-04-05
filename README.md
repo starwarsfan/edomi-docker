@@ -38,7 +38,8 @@ sudo git clone https://github.com/starwarsfan/edomi-docker.git
 ```shell
 cd edomi-baseimage
 sudo docker build \
-    -t starwarsfan/edomi-baseimage:latest-centos7 .
+    -f amd64.Dockerfile \
+    -t starwarsfan/edomi-baseimage:amd64-latest .
 ```
 
 ##### Build Edomi Docker image itself
@@ -49,7 +50,7 @@ where the version should be replaced with `latest`, if you build your personal b
 with `latest` as version:
 
 ```shell
-FROM starwarsfan/edomi-baseimage:7
+FROM starwarsfan/edomi-baseimage:amd64-latest
 ```
 
 Afterwards you can trigger the build with:
@@ -57,14 +58,15 @@ Afterwards you can trigger the build with:
 ```shell
 cd edomi-docker
 sudo docker build \
-    -t starwarsfan/edomi-docker:latest-centos7 .
+    -f amd64.Dockerfile \
+    -t starwarsfan/edomi-docker:amd64-latest .
 ```
 
 You can pass a different root passwort to the build and you can pass the Edomi version to download too:
 
 ```shell
 sudo docker build \
-    -t starwarsfan/edomi-docker:latest-centos7 \
+    -t starwarsfan/edomi-docker:amd64-latest \
     --build-arg ROOT_PASS=Th3Passw0rd \
     --build-arg EDOMI_VERSION=EDOMI-Beta_156.zip .
 ```
@@ -87,7 +89,7 @@ sudo docker run \
     -e WEBSOCKETPORT=8080 \
     -e HOSTIP=192.168.178.3 \
     -d \
-    starwarsfan/edomi-docker:latest-centos7
+    starwarsfan/edomi-docker:amd64-latest
 ```
 
 With this configuration the edomi web instance is reachable via URL _http://\<docker-host-ip\>/admin_ or
