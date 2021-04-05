@@ -23,7 +23,8 @@ RUN echo -e "${ROOT_PASS}\n${ROOT_PASS}" | (passwd --stdin root) \
 # Replace 'reboot' and 'shutdown' with own handler scripts
 COPY bin/start.sh ${START_SCRIPT}
 COPY sbin/reboot sbin/shutdown sbin/service /sbin/
-RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown /sbin/service
+RUN chmod +x ${START_SCRIPT} /sbin/reboot /sbin/shutdown /sbin/service \
+ && dos2unix /sbin/reboot /sbin/shutdown /sbin/service
 
 RUN mkdir ${EDOMI_EXTRACT_PATH} \
  && cd ${EDOMI_EXTRACT_PATH} \
