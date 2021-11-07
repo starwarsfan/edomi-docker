@@ -12,6 +12,8 @@
 callDir=$(pwd)
 ownLocation="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${ownLocation}
+. ./include/helpers_console.sh
+_init
 
 helpMe() {
     echo "
@@ -26,6 +28,18 @@ helpMe() {
     "
 }
 
+buildImage() {
+    local _arch=$1
+    info "Building starwarsfan/edomi-docker:latest-${_arch}"
+    docker build -f "${_arch}.Dockerfile" -t "starwarsfan/edomi-docker:latest-${_arch}" .
+    info " -> Done"
+    if ${PUBLISH_IMAGE} ; then
+        info "Pushing starwarsfan/edomi-docker:latest-${_arch}"
+        docker push "starwarsfan/edomi-docker:latest-${_arch}"
+        info " -> Done"
+    fi
+}
+
 PUBLISH_IMAGE=false
 BUILD_ARM_IMAGES=false
 
@@ -38,20 +52,12 @@ while getopts aph? option; do
     esac
 done
 
-docker build -f amd64.Dockerfile -t starwarsfan/edomi-docker:amd64-latest .
-if ${PUBLISH_IMAGE} ; then
-    docker push starwarsfan/edomi-docker:amd64-latest
-fi
+info "Disabling buildkit etc. pp."
+export DOCKER_BUILDKIT=0
+export COMPOSE_DOCKER_CLI_BUILD=0
+info " -> Done"
 
-docker build -f arm64v8.Dockerfile -t starwarsfan/edomi-docker:arm64v8-latest .
-if ${PUBLISH_IMAGE} ; then
-    docker push starwarsfan/edomi-docker:arm64v8-latest
-fi
-
+buildImage amd64
 if ${BUILD_ARM_IMAGES} ; then
-    docker build -f arm32v7.Dockerfile -t starwarsfan/edomi-docker:arm32v7-latest .
-    if ${PUBLISH_IMAGE} ; then
-        echo "ARMv7 unsupported at the moment, no push to DockerHub :-/"
-    #    docker push starwarsfan/edomi-docker:arm32v7-latest
-    fi
+    buildImage arm64
 fi
