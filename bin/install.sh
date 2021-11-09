@@ -42,13 +42,13 @@ configureEnvironment () {
 	echo "query_cache_type=1" 				>> /tmp/tmp.txt
 	echo "wait_timeout=28800" 				>> /tmp/tmp.txt
 	echo "interactive_timeout=28800" 		>> /tmp/tmp.txt
-	sed -i '/\[mysqld\]/r /tmp/tmp.txt' /etc/my.cnf
+#	sed -i '/\[mysqld\]/r /tmp/tmp.txt' /etc/my.cnf
 
 	# mySQL-Symlink erstellen
-	echo "Alias=mysqld.service" 			> /tmp/tmp.txt
-	sed -i '/\[Install\]/r /tmp/tmp.txt' /usr/lib/systemd/system/mariadb.service
-	ln -s '/usr/lib/systemd/system/mariadb.service' '/etc/systemd/system/mysqld.service'
-	systemctl daemon-reload
+#	echo "Alias=mysqld.service" 			> /tmp/tmp.txt
+#	sed -i '/\[Install\]/r /tmp/tmp.txt' /usr/lib/systemd/system/mariadb.service
+#	ln -s '/usr/lib/systemd/system/mariadb.service' '/etc/systemd/system/mysqld.service'
+#	systemctl daemon-reload
 
 	# -------------------------------
 	echo -e "\033[32m>>> PHP konfigurieren\033[39m"
