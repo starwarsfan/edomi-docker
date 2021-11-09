@@ -42,7 +42,7 @@ configureEnvironment () {
 	echo "query_cache_type=1" 				>> /tmp/tmp.txt
 	echo "wait_timeout=28800" 				>> /tmp/tmp.txt
 	echo "interactive_timeout=28800" 		>> /tmp/tmp.txt
-#	sed -i '/\[mysqld\]/r /tmp/tmp.txt' /etc/my.cnf
+	sed -i '/\[mysqld\]/r /tmp/tmp.txt' /etc/my.cnf.d/mariadb-server.cnf
 
 	# mySQL-Symlink erstellen
 #	echo "Alias=mysqld.service" 			> /tmp/tmp.txt
