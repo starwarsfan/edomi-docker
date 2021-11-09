@@ -101,7 +101,7 @@ sed -i -e "s@\(.*\)\(chmod 777 /dev/vcsa\)@#\2@g" \
        -e "s@\(.*\)\(service mysqld start\)@#\2@g" \
        -e "s@\(.*\)\(timeout\)@#\2@g" \
        -e "s@\(.*\)\(systemctl\)@#\2@g" \
-       -e "/\sphp \$MAIN_PATH.*/i systemctl restart php-fpm" /usr/local/edomi/main/start.sh
+       -e "s@pkill -9 php.*@pkill -9 -x php@g" /usr/local/edomi/main/start.sh
 
 # Cleanup potential leftovers
 rm -rf /run/httpd/*
@@ -109,12 +109,9 @@ rm -rf /run/httpd/*
 systemctl start mysqld
 systemctl start vsftpd
 systemctl start httpd
+systemctl start php-fpm
 systemctl start chronyd
 systemctl start sshd
-# Start of php-fpm not neccessary at this point as Edomi main loop is
-# killing all php processes. That's why the restart cmd is inserted at
-# Edomi's start.sh script on the previous sed statement!
-#systemctl start php-fpm
 
 /usr/local/edomi/main/start.sh &
 
