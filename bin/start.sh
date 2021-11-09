@@ -88,13 +88,20 @@ unlink /etc/localtime
 edomiTZ=$(awk -F "=" '/^set_timezone/ {gsub(/[ \047]/, "", $2); print $2}' ${EDOMI_CONF})
 ln -s /usr/share/zoneinfo/${edomiTZ} /etc/localtime
 
-# Disable chmod for not existing /dev/vcsa
-# Disable removal of mysql.sock
+# Disable:
+# - chmod for not existing /dev/vcsa
+# - removal of mysql.sock
+# - all systemctl calls
+# - ntpd time sync
+# Add 'systemctl start php-fpm right before calling main edomi function
 # Must be done on each start as start.sh might be replaced by an Edomi update!
 sed -i -e "s@\(.*\)\(chmod 777 /dev/vcsa\)@#\2@g" \
        -e "s@\(.*\)\(service mysqld stop\)@#\2@g" \
        -e "s@\(.*\)\(rm -f \$MYSQL_PATH/mysql.sock\)@#\2@g" \
-       -e "s@\(.*\)\(service mysqld start\)@#\2@g" /usr/local/edomi/main/start.sh
+       -e "s@\(.*\)\(service mysqld start\)@#\2@g" \
+       -e "s@\(.*\)\(timeout\)@#\2@g" \
+       -e "s@\(.*\)\(systemctl\)@#\2@g" \
+       -e "/\sphp \$MAIN_PATH.*/i systemctl restart php-fpm" /usr/local/edomi/main/start.sh
 
 # Cleanup potential leftovers
 rm -rf /run/httpd/*
@@ -102,8 +109,12 @@ rm -rf /run/httpd/*
 systemctl start mysqld
 systemctl start vsftpd
 systemctl start httpd
-systemctl start ntpd
+systemctl start chronyd
 systemctl start sshd
+# Start of php-fpm not neccessary at this point as Edomi main loop is
+# killing all php processes. That's why the restart cmd is inserted at
+# Edomi's start.sh script on the previous sed statement!
+#systemctl start php-fpm
 
 /usr/local/edomi/main/start.sh &
 
@@ -116,7 +127,8 @@ edomiPID=$!
 stop_services()
 {
     systemctl stop sshd
-    systemctl stop ntpd
+    systemctl stop chronyd
+    systemctl stop php-fpm
     systemctl stop httpd
     systemctl stop vsftpd
     systemctl stop mysqld
