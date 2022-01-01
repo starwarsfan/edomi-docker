@@ -29,8 +29,8 @@ the image from the first build step.
 ##### Pull Edomi-Docker Git repos from GitHub
 
 ```shell
-sudo git clone https://github.com/starwarsfan/edomi-baseimage.git
-sudo git clone https://github.com/starwarsfan/edomi-docker.git
+git clone https://github.com/starwarsfan/edomi-baseimage.git
+git clone https://github.com/starwarsfan/edomi-docker.git
 ```
 
 ##### Build Edomi baseimage
@@ -42,7 +42,7 @@ sudo docker build \
     -t starwarsfan/edomi-baseimage:amd64-latest .
 ```
 
-##### Build Edomi Docker image itself
+##### Build Edomi Docker image
 
 If you built an own Edomi-Baseimage (the step before), you need to update it's reference
 on the first line of the Dockerfile. The default first line looks like the following snippet,
@@ -273,32 +273,3 @@ Open cmdline inside of container
 ```shell
 sudo docker exec -i -t edomi /bin/bash
 ```
-
-#### C: Update from 1.62 to 1.63
-
-The following steps can be used if you're facing issues during the update from version 1.62 to 1.63.
-
-To fix the update problems between these two versions, the image contains a fixed version of the file, which
-causes the update failure. Here are the steps to do:
-
-##### Fix using cmdline on Docker host
-
-* Pause (not stop!) Edomi using the Admin-UI
-* Execute the following cmd:
-  ````
-  $ docker exec -it <name-of-your-container> /root/patch_1.62.sh
-  ````
-* Update Edomi to 1.63 using the Admin-UI
-
-##### Fix using cmdline inside the container
-
-These variant could be used if you're running the Edomi container on a management tool like
-[Portainer](https://www.portainer.io/). To do so, perform these steps:
-
-* Pause (not stop!) Edomi using the Edomi Admin-UI
-* Open the cmdline on the container
-* Execute the following cmd:
-  ````
-  $ /root/patch_1.62.sh
-  ````
-* Update Edomi to 1.63 using the Admin-UI
