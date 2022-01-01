@@ -88,19 +88,18 @@ unlink /etc/localtime
 edomiTZ=$(awk -F "=" '/^set_timezone/ {gsub(/[ \047]/, "", $2); print $2}' ${EDOMI_CONF})
 ln -s /usr/share/zoneinfo/${edomiTZ} /etc/localtime
 
-# Disable:
+# Disable (comment) the following statements:
 # - chmod for not existing /dev/vcsa
 # - removal of mysql.sock
-# - all systemctl calls
+# - all systemctl a/o service calls
 # - ntpd time sync
 # Add 'systemctl start php-fpm right before calling main edomi function
 # Must be done on each start as start.sh might be replaced by an Edomi update!
 sed -i -e "s@\(.*\)\(chmod 777 /dev/vcsa\)@#\2@g" \
-       -e "s@\(.*\)\(service mysqld stop\)@#\2@g" \
        -e "s@\(.*\)\(rm -f \$MYSQL_PATH/mysql.sock\)@#\2@g" \
-       -e "s@\(.*\)\(service mysqld start\)@#\2@g" \
+       -e "s@\(.*\)\(systemctl \)@#\2@g" \
+       -e "s@\(.*\)\(service \)@#\2@g" \
        -e "s@\(.*\)\(timeout\)@#\2@g" \
-       -e "s@\(.*\)\(systemctl\)@#\2@g" \
        -e "s@pkill -9 php.*@pkill -9 -x php@g" /usr/local/edomi/main/start.sh
 
 # Cleanup potential leftovers
