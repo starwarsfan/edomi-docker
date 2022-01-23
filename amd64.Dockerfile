@@ -47,6 +47,12 @@ RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
            -e "s@\(rm -f \$MYSQL_PATH/mysql.sock\)@#\1@g" \
            -e "s/\(service mysqld start\)/#\1/g" /usr/local/edomi/main/start.sh
 
+# Nginx:
+# - Change default listen port to 88 as httpd is already listening on port 80
+# - Install Edomi configuration
+RUN sed -i "s/80 /88 /g" /etc/nginx/nginx.conf
+COPY etc/nginx/conf.d/edomi.conf /etc/nginx/conf.d/
+
 # Enable lib_mysqludf_sys
 RUN systemctl start mariadb \
  && mysql -u root mysql < /root/installdb.sql \
