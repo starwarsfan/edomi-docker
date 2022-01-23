@@ -78,15 +78,13 @@ sudo docker build \
 sudo docker run \
     --name edomi \
     --restart=on-failure \
-    -p 80:80 \
-    -p 8080:8080 \
-    -p 3671:3671/udp \
+    -p 80:8888 \
     -p 50000:50000/udp \
     -p 50001:50001/udp \
     -p 22222:22 \
-    -e KNXGATEWAY=192.168.178.4 \
     -e KNXACTIVE=true \
-    -e WEBSOCKETPORT=8080 \
+    -e KNXGATEWAYIP=192.168.178.4 \
+    -e KNXGATEWAYPORT=3700 \
     -e HOSTIP=192.168.178.3 \
     -d \
     starwarsfan/edomi-docker:amd64-latest
@@ -94,7 +92,8 @@ sudo docker run \
 
 With this configuration the edomi web instance is reachable via URL _http://\<docker-host-ip\>/admin_ or
 _https://\<docker-host-ip\>/admin_ and the commandline via ssh with _ssh -p 22222 \<docker-host-ip\>_.
-With the (optional) parameters KNXGATEWAY, KNXACTIVE and HOSTIP you can pre-configure some settings for Edomi.
+With the (optional) parameters KNXGATEWAYIP, KNXGATEWAYPORT, KNXACTIVE and HOSTIP you can pre-configure some 
+settings for Edomi.
 Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "global_serverIP" in Edomi (or via
 docker run parameter 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
 Change http and/or https port to your needs.
@@ -102,25 +101,15 @@ Change http and/or https port to your needs.
 If you use other Edomi modules which communicate using dedicated ports, you need to map them using additional
 _-p <host-port>:<container-port>_ parameters.
 
-#### 2.1 Explanation of parameters
+#### 2.1 Portmappings
 
 **It is important to map all used ports!** According to the example with the default values above, here's a short
 description:
- * -p 80:80
+ * -p 80:8888
 
-   Mapping of used http port to Edomi http port.
-
- * -p 8080:8080
-
-   Mapping of Websocket port. These values must be the same on both sides of the colon and correspond to the
-   configuration value on Edomi base configuration.
-   The "WEBSOCKETPORT" variable will allow to set the websocket port in the edomi configuration.
-   All three values (both sides of the mapping as well as the "WEBSOCKETPORT" value) must match.
-
- * -p 3671:3671/udp
-
-   Mapping of used port for KNX traffic. As this is UDP traffic, it must be finished with "/udp" right after
-   the internal port, which must correspond to the configuration value on Edomi base configuration.
+   Mapping of used http port to internal Edomi http port. This port is used to access the admin ui 
+   (http://.../admin/) and the visualization (http://.../visu/)
+   **Important:** If a different source port than 80 is used, HTTPPORT must be set with this port too!
 
  * -p 50000:50000/udp
 
@@ -135,6 +124,27 @@ description:
  * -p 22222:22
 
    Mapping of used ssh port to access the container using ssh.
+
+#### 2.2 Environment variables
+ * -e KNXACTIVE=true
+   
+   Used to activate Edomi's KNX module
+
+ * -e KNXGATEWAYIP=192.168.178.4 
+   
+   IP address of KNX gateway
+
+ * -e KNXGATEWAYPORT=3700 
+   
+   Port to access KNX on the gateway
+
+ * -e HOSTIP=192.168.178.3
+   
+   IP of the host on which the container is running
+
+ * -e HTTPPORT=80
+   
+   If a different http source port than 80 is mapped, this variable must be set with the used port
 
 
 **Please note:**
