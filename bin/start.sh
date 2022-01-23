@@ -30,6 +30,7 @@ fi
 # These are ENV VARs on docker run
 
 HTTPD_CONF="/etc/httpd/conf/httpd.conf"
+NGINX_CONF="/etc/nginx/conf.d/edomi.conf"
 EDOMI_CONF="/usr/local/edomi/edomi.ini"
 CSR="/etc/pki/tls/private/edomi.csr"
 CAKEY="/etc/pki/tls/private/edomi.key"
@@ -48,22 +49,28 @@ fi
 CONTAINER_IP=$(hostname -i)
 
 # Set edomi.ini config values based on environment vars given by docker.
-if [ -z "$HOSTIP" ]; then
-	echo "HOSTIP not set, using edomi default settings."
-	sed -i -e "s#global_visuIP.*#global_visuIP='$CONTAINER_IP'#" ${EDOMI_CONF}
-else
+if [ -n "$HOSTIP" ]; then
 	echo "HOSTIP set to $HOSTIP ... configure $EDOMI_CONF and $HTTPD_CONF"
 	sed -i -e "s#global_serverIP.*#global_serverIP='$HOSTIP'#" \
-	       -e "s#global_knxIP.*#global_knxIP='$HOSTIP'#" \
-	       -e "s#global_visuIP.*#global_visuIP='$CONTAINER_IP'#" ${EDOMI_CONF}
+	       -e "s#global_knxIP.*#global_knxIP='$HOSTIP'#" ${EDOMI_CONF}
 	sed -i -e "s/^ServerName.*/ServerName $HOSTIP/g" ${HTTPD_CONF}
 fi
 
-if [ -z "$KNXGATEWAY" ]; then
-	echo "KNXGATEWAY not set, using edomi default settings."
+# global_visuIP must be localhost as nginx is forwarding to this
+sed -i -e "s#global_visuIP.*#global_visuIP='127.0.0.1'#" ${EDOMI_CONF}
+
+if [ -z "$KNXGATEWAYIP" ]; then
+	echo "KNXGATEWAYIP not set, using edomi default settings."
 else
-	echo "KNXGATEWAY set to $KNXGATEWAY ... configure $EDOMI_CONF"
-	sed -i -e "s#global_knxRouterIp=.*#global_knxRouterIp='$KNXGATEWAY'#" ${EDOMI_CONF}
+	echo "KNXGATEWAYIP set to $KNXGATEWAYIP ... configure $EDOMI_CONF"
+	sed -i -e "s#global_knxRouterIp=.*#global_knxRouterIp='$KNXGATEWAYIP'#" ${EDOMI_CONF}
+fi
+
+if [ -z "$KNXGATEWAYPORT" ]; then
+	echo "KNXGATEWAYPORT not set, using edomi default settings."
+else
+	echo "KNXGATEWAYPORT set to $KNXGATEWAYPORT ... configure $EDOMI_CONF"
+	sed -i -e "s#global_knxRouterPort=.*#global_knxRouterPort='$KNXGATEWAYPORT'#" ${EDOMI_CONF}
 fi
 
 if [ -z "$KNXACTIVE" ]; then
@@ -78,6 +85,15 @@ if [ -z "$WEBSOCKETPORT" ]; then
 else
 	echo "WEBSOCKETPORT set to $WEBSOCKETPORT ... configure $EDOMI_CONF"
 	sed -i -e "s#global_visuWebsocketPort=.*#global_visuWebsocketPort='$WEBSOCKETPORT'#" ${EDOMI_CONF}
+	echo "... and $NGINX_CONF"
+	sed -i -e "s#http://127.0.0.1:8080#http://127.0.0.1:$WEBSOCKETPORT#" ${NGINX_CONF}
+fi
+
+if [ -z "$HTTPPORT" ]; then
+	echo "HTTPPORT not set, using edomi default settings."
+else
+	echo "HTTPPORT set to $HTTPPORT ... configure $NGINX_CONF"
+	sed -i -e "s#:80/websocket#:${HTTPPORT}/websocket#" ${NGINX_CONF}
 fi
 
 echo "Disabling heartbeat log output every second ... configure $EDOMI_CONF"
@@ -111,6 +127,7 @@ systemctl start httpd
 systemctl start php-fpm
 systemctl start chronyd
 systemctl start sshd
+systemctl start nginx
 
 /usr/local/edomi/main/start.sh &
 
