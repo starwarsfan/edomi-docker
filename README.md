@@ -78,7 +78,7 @@ sudo docker build \
 sudo docker run \
     --name edomi \
     --restart=on-failure \
-    -p 80:8888 \
+    -p 80:88 \
     -p 50000:50000/udp \
     -p 50001:50001/udp \
     -p 22222:22 \
@@ -105,49 +105,66 @@ _-p <host-port>:<container-port>_ parameters.
 
 **It is important to map all used ports!** According to the example with the default values above, here's a short
 description:
- * -p 80:8888
+
+**Mandatory:**
+ * -p 80:88
 
    Mapping of used http port to internal Edomi http port. This port is used to access the admin ui 
    (http://.../admin/) and the visualization (http://.../visu/)
    **Important:** If a different source port than 80 is used, HTTPPORT must be set with this port too!
 
+**Optional:**
  * -p 50000:50000/udp
 
-   Mapping of used port for KNX control endpoint. As this is UDP traffic, it must be finished with "/udp"
-   right after the internal port, which must correspond to the configuration value on Edomi base configuration.
+   If using KNX, the mapping of used port for KNX control endpoint. As this is UDP traffic, it must be finished 
+   with "/udp" right after the internal port, which must correspond to the configuration value on Edomi base 
+   configuration.
 
  * -p 50001:50001/udp
 
-   Mapping of used port for KNX data endpoint. As this is UDP traffic, it must be finished with "/udp"
+   If using KNX, the mapping of used port for KNX data endpoint. As this is UDP traffic, it must be finished with "/udp"
    right after the internal port, which must correspond to the configuration value on Edomi base configuration.
 
  * -p 22222:22
 
-   Mapping of used ssh port to access the container using ssh.
+   Mapping of used ssh port to access the container using ssh. If not mapping some external port to port 22,
+   ssh can't be used to access the container.
 
 #### 2.2 Environment variables
+**Mandatory:**
+ * -e HOSTIP=192.168.178.3
+
+  IP of the host on which the container is running
+
+**Optional:**
+ * -e ROOT_PASS=sup3rS3cr3tPassw0rd
+
+  The password to access the container using ssh. You should set this var with a password of your choice
+  as the default root password is 123456. If the container is initially starting, a ssh keypair will be
+  created and the private key is printed to stdout. So have a look at the container log to get the private
+  key for ssh access.
+  
+  It doesn't matter if you're _not_ mapping some external port to the ssh port (22) inside of the container 
+  as in this case the container can't be accessed using ssh.
+
+ * -e HTTPPORT=80
+
+  If a different http source port than 80 is mapped, this variable must be set with the used port!
+
  * -e KNXACTIVE=true
    
    Used to activate Edomi's KNX module
 
  * -e KNXGATEWAYIP=192.168.178.4 
    
-   IP address of KNX gateway
+   IP address of the used KNX gateway
 
  * -e KNXGATEWAYPORT=3700 
    
    Port to access KNX on the gateway
 
- * -e HOSTIP=192.168.178.3
-   
-   IP of the host on which the container is running
-
- * -e HTTPPORT=80
-   
-   If a different http source port than 80 is mapped, this variable must be set with the used port
-
-
-**Please note:**
+#### 2.3 Restart behaviour
+**Important!**
 
 It is important to use the option _--restart=on-failure_ because it is used to handle Edomi shutdown or restart
 from the admin ui. The trick is to exit the container with a non zero exit code in case Edomi should be restartet.
