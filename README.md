@@ -234,7 +234,42 @@ example:
 sudo docker run --name edomi -v /home/edomi/feiertage.csv:/usr/local/edomi/www/visu/feiertage.csv ...
 ```
 
-#### 4 Migrate from Edomi 1.x (CentOS 6 Container) to 2.x with CentOS 7 Container
+#### 4 Reverse proxy in front of Edomi container
+If you use an Nginx reverse proxy in front of the Edomi container, you need to 
+add the following location entry:
+```
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
+server {
+    ...
+    location /edomi {
+        sub_filter          "WebSocket(serverProtocol+'://'+serverIp+':88/websocket')" "WebSocket(serverProtocol+'://'+serverIp+'/edomi/websocket')";
+        sub_filter_types    application/javascript;
+        sub_filter_once     off;
+
+        proxy_pass          http://192.168.123.123:88/;
+        proxy_set_header    X-Forwarded-Host $host;
+        proxy_set_header    X-Forwarded-Server $host;
+        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Real-IP $remote_addr;
+        proxy_redirect>     off;
+        proxy_http_version  1.1;
+        proxy_set_header    Upgrade $http_upgrade;
+        proxy_set_header    Connection "upgrade";
+    }
+```
+To make this work you need to replace:
+- `edomi` (2 times) with your used path to Edomi
+- `88` (also 2 times) with the used source port, which you map onto the container
+- `192.168.123.123` with the IP of the machine, where the Edomi container is running
+
+**Important:** Make sure to replace only `edomi` and `88` with your used values, 
+don't touch the slashes a/o colon right before or after the replacements!
+
+#### 5 Migrate from Edomi 1.x (CentOS 6 Container) to 2.x with CentOS 7 Container
 
 * Backup current Edomi instance using `Verwaltung > Datensicherung > Backup herunterladen`
 * Create volumes to store data, see 3.1 above
@@ -246,28 +281,7 @@ sudo docker run --name edomi -v /home/edomi/feiertage.csv:/usr/local/edomi/www/v
 
 #### A: Install docker
 
- This instruction works for a <b>Centos7</b> docker host. Other distributions may need some adjustments.
-
-```shell
-sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/7/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
-EOF
-```
-
-```shell
-sudo yum install docker-engine -y
-```
-```shell
-sudo systemctl enable docker.service
-```
-```shell
-sudo systemctl start docker.service
-```
+See https://docs.docker.com/engine/install/
 
 #### B: Useful commands
 
