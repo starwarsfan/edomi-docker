@@ -17,7 +17,9 @@ _init
 
 helpMe() {
     echo "
-    Helper script to build Edomi Docker image.
+    Helper script to build Edomi Docker image. The build will produce a so
+    called \"multi-arch-image\", so x86_64 and ARMv8 will be available within
+    the same tag.
 
     Usage:
     ${0} [options]
@@ -30,18 +32,41 @@ helpMe() {
 
 buildImage() {
     local _arch=$1
-    info "Building starwarsfan/edomi-docker:latest-${_arch}"
-    docker build -f "${_arch}.Dockerfile" -t "starwarsfan/edomi-docker:latest-${_arch}" .
+    info "Building starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch}"
+    docker build -f "${_arch}.Dockerfile" -t "starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch}" .
     info " -> Done"
     if ${PUBLISH_IMAGE} ; then
-        info "Pushing starwarsfan/edomi-docker:latest-${_arch}"
-        docker push "starwarsfan/edomi-docker:latest-${_arch}"
+        info "Pushing starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch}"
+        docker push "starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch}"
+        info " -> Done"
+    fi
+}
+
+buildManifest() {
+    local _arch1=$1
+    local _arch2=$2
+    info "Building docker manifest for starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest"
+    if [ -z "${_arch2}" ] ; then
+        docker manifest create \
+            "starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest" \
+            --amend "starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch1}"
+    else
+        docker manifest create \
+            "starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest" \
+            --amend "starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch1}" \
+            --amend "starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch2}"
+    fi
+    info " -> Done"
+    if ${PUBLISH_IMAGE} ; then
+        info "Pushing docker manifest starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest"
+        docker manifest push "starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest"
         info " -> Done"
     fi
 }
 
 PUBLISH_IMAGE=false
 BUILD_ARM_IMAGES=false
+IMAGE_SUFFIX=-dev
 
 while getopts aph? option; do
     case ${option} in
@@ -60,4 +85,7 @@ info " -> Done"
 buildImage amd64
 if ${BUILD_ARM_IMAGES} ; then
     buildImage arm64
+    buildManifest amd64 arm64
+else
+    buildManifest amd64
 fi
