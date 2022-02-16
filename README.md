@@ -163,6 +163,10 @@ description:
    
    Port to access KNX on the gateway
 
+ * -e TZ=Europe/Zurich 
+   
+   Timezone to use on Edomi configuration
+
 #### 2.3 Restart behaviour
 **Important!**
 

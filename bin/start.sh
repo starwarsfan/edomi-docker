@@ -96,6 +96,13 @@ else
 	sed -i -e "s#:80/websocket#:${HTTPPORT}/websocket#" ${NGINX_CONF}
 fi
 
+if [ -z "$TZ" ]; then
+	echo "TZ not set, using edomi default settings."
+else
+	echo "TZ set to $TZ ... configure $EDOMI_CONF"
+	sed -i -e "s#set_timezone=.*#set_timezone='$TZ'#" ${EDOMI_CONF}
+fi
+
 echo "Disabling heartbeat log output every second ... configure $EDOMI_CONF"
 sed -i -e "s#global_serverConsoleInterval=.*#global_serverConsoleInterval=false#" ${EDOMI_CONF}
 
