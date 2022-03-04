@@ -45,21 +45,21 @@ buildImage() {
 buildManifest() {
     local _arch1=$1
     local _arch2=$2
-    info "Building docker manifest for starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest"
+    info "Building docker manifest for starwarsfan/edomi-docker${IMAGE_SUFFIX}:${IMAGE_VERSION}"
     if [ -z "${_arch2}" ] ; then
         docker manifest create \
-            "starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest" \
+            "starwarsfan/edomi-docker${IMAGE_SUFFIX}:${IMAGE_VERSION}" \
             --amend "starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch1}"
     else
         docker manifest create \
-            "starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest" \
+            "starwarsfan/edomi-docker${IMAGE_SUFFIX}:${IMAGE_VERSION}" \
             --amend "starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch1}" \
             --amend "starwarsfan/edomi-docker${IMAGE_SUFFIX}:manifest-${_arch2}"
     fi
     info " -> Done"
     if ${PUBLISH_IMAGE} ; then
-        info "Pushing docker manifest starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest"
-        docker manifest push "starwarsfan/edomi-docker${IMAGE_SUFFIX}:latest"
+        info "Pushing docker manifest starwarsfan/edomi-docker${IMAGE_SUFFIX}:${IMAGE_VERSION}"
+        docker manifest push "starwarsfan/edomi-docker${IMAGE_SUFFIX}:${IMAGE_VERSION}"
         info " -> Done"
     fi
 }
@@ -67,6 +67,7 @@ buildManifest() {
 PUBLISH_IMAGE=false
 BUILD_ARM_IMAGES=false
 IMAGE_SUFFIX=-dev
+IMAGE_VERSION=latest
 
 while getopts aph? option; do
     case ${option} in
