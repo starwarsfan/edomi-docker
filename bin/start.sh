@@ -136,6 +136,9 @@ systemctl start chronyd
 systemctl start sshd
 systemctl start nginx
 
+# Prevent message "System is booting up. Unprivileged users are not permitted..." during ssh login
+rm -rf /run/nologin
+
 /usr/local/edomi/main/start.sh &
 
 edomiPID=$!
