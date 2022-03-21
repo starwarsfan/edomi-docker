@@ -26,8 +26,8 @@ configureEnvironment () {
 	echo -e "\033[32m>>> mySQL/MariaDB konfigurieren\033[39m"
 	systemctl start mariadb
 	/usr/bin/mysqladmin -u root password ""
-	mysql -e "DROP DATABASE test;"
-	mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'"
+#	mysql -e "DROP DATABASE test;"
+#	mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'"
 	mysql -e "FLUSH PRIVILEGES;"
 	mysql -e "GRANT ALL ON *.* TO mysql@'%';"
 
