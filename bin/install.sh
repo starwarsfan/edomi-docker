@@ -42,6 +42,13 @@ configureEnvironment () {
 	echo "query_cache_type=1" 				>> /tmp/tmp.txt
 	echo "wait_timeout=28800" 				>> /tmp/tmp.txt
 	echo "interactive_timeout=28800" 		>> /tmp/tmp.txt
+
+	# STRICT_TRANS_TABLES (strict mode) needs to be disabled, otherwise statements
+	# like this will fail because of the empty values:
+	# INSERT INTO edomiProject.editLogicCmdList (targetid,cmd,cmdid1,cmdid2,cmdoption1,cmdoption2,cmdvalue1,cmdvalue2) \
+	#                                    VALUES ('2',    '1', '101', '',    '',        '',        null,     null)
+	echo "sql_mode=ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION" >> /tmp/tmp.txt
+
 	sed -i '/\[mysqld\]/r /tmp/tmp.txt' /etc/my.cnf.d/mariadb-server.cnf
 
 	# mySQL-Symlink erstellen
