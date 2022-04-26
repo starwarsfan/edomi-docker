@@ -66,8 +66,8 @@ buildManifest() {
 
 PUBLISH_IMAGE=false
 BUILD_ARM_IMAGES=false
-IMAGE_SUFFIX=-dev
-IMAGE_VERSION=latest
+IMAGE_SUFFIX=
+IMAGE_VERSION=2.03.2
 
 while getopts aph? option; do
     case ${option} in
