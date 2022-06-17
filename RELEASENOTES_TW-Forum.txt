@@ -1,0 +1,71 @@
+Hallo miteinander,
+
+die Version [b]2.03[/b] des Edomi-Dockerimages basierend auf CentOS 7 ist verfügbar (1.63 mit CentOS 6 bleibt unverändert bestehen). Dockerfiles incl. Dokumentation befinden sich auf [url=https://github.com/starwarsfan/edomi-docker]GitHub[/url] und [url=https://hub.docker.com/r/starwarsfan/edomi-docker/]hier[/url] kann das Image bezogen werden. Folgende Anmerkungen dazu:
+[list]Es gibt aktuell diese Versionen für [b]x86_64[/b] Hosts, welche auf dem Image [b]centos:7[/b] basieren:
+[list]amd64-latest
+[*]amd64-2.03
+[*]amd64-2.02.1
+[*]amd64-2.02
+[*]amd64-2.01.1
+[*]amd64-2.01
+[*]1.63
+[*]1.62
+[*]1.61
+[*]1.58
+[/list]
+[*]Das Basis-System wurde in das Image [url=https://hub.docker.com/r/starwarsfan/edomi-baseimage/]starwarsfan/edomi-baseimage[/url] ausgelagert, welches wiederum auf [url=https://hub.docker.com/repository/docker/starwarsfan/edomi-baseimage-builder]starwarsfan/edomi-baseimage-builder[/url] basiert. Damit müssen nun nicht bei jedem Build die CentOS-Pakete heruntergeladen und installiert werden
+[*]Edomi selbst befindet sich im Image [url=https://hub.docker.com/r/starwarsfan/edomi-docker/]starwarsfan/edomi-docker[/url]
+[*]Es sind Mountpoints für die Verzeichnisse [i]/var/edomi-backups[/i], [i]/var/lib/mysql[/i] sowie [i]/usr/local/edomi[/i] vorhanden, so dass insbesondere die Backups auf einem Verzeichnis auf dem Host vorgehalten werden können
+[*]Es wird nun bei jedem Start des Containers das Löschen der [i]mysql.sock[/i] verhindert
+[*]Die Fehlermeldung bzgl. [i]/dev/vcsa[/i] sollte nicht mehr auftreten.
+[*]Es sind zwingend die folgenden Optionen bei docker run ... zu verwenden:
+[list][b]-p <host-port>:<container-port>[/b]
+Es ist zwingend notwendig, die verwendeten Ports mit jeweils einem solchen Statement in den Container zu mappen. Das betrifft insbesondere den http- resp. https-Port, den Port für den Websocket sowie die drei Ports für die KNX-Kommunikation. Werden weitere Ports verwendet, bspw. für UDP-Traffic aus eigenen Logiken heraus, müssen diese ebenfalls nach obigem Schema gemappt werden.
+[*][b]--restart=on-failure[/b]
+Diese Option wird benötigt, damit der Container via Edomi-Admin-UI gestoppt oder neu gestartet werden kann.
+[/list]
+[*]Der Container kann via Edomi-Update-Mechanismus auch direkt aktualisiert werden, wenn eine neue Edomi-Version vorliegt.
+[*]PHP 7.4 mit den folgenden Paketen:
+[list]php
+[*]php-curl
+[*]php-gd
+[*]php-json
+[*]php-mbstring
+[*]php-mysql
+[*]php-process
+[*]php-snmp
+[*]php-soap
+[*]php-ssh2
+[*]php-xml
+[*]php-zip
+[/list]
+[*]Es ist eine ganze Reihe zusätzlicher Pakete für Userland-LBS'e bereits vorab installiert. Namentlich für die folgenden Bausteine:
+[list]Telegram-LBS (19000303 / 19000304)
+[*]Mailer-LBS (19000587)
+[*]Philips HUE Bridge (19000195)
+[*]MQTT Publish Server (19001051)
+[*]AlexaControl LBS (19000809)
+[/list]
+[*]Wird der Container selbst gebaut, kann die Version des zu verwendenden Edomi-Archives angegeben werden. Damit ist es möglich, bei einem Edomi-Update selbst schnell einen neuen Container zu bauen. Konkret geht das dann so:
+[code]docker build -t starwarsfan/edomi-docker:latest --build-arg EDOMI_VERSION=EDOMI_200.tar .[/code]
+Damit wird das angegebene Archiv von [url=http://edomi.de/download/install/]http://edomi.de/download/install/[/url] heruntergeladen und im Image installiert.
+[/list]
+
+[b]Achtung 1:[/b] Insbesondere bei der Verwendung des Edomi-eigenen Update-Mechanismus ist eine gewisse Vorsicht geboten! Wird ein neuer Container angelegt (docker run ...), so wird dieser die Edomi-Version enthalten, welche das ursprüngliche Docker-Image enthält. Mitunter passen da aber die vorhandenen Backup-Daten nicht dazu, wenn es bereits eine neuere Edomi-Version gab und der Container via Edomi selbst auf die neueste Version aktualisiert wurde. Es sollte als dafür gesorgt werden, dass es ein Backup der alten Edomi-Version gibt, welches nach einem erneuten docker run ... importiert und [b]danach[/b] auf die neueste Edomi-Version aktualisiert wird.
+
+Die empfohlene Vorgehensweise für ein Update des Basis-Images ist diese hier:
+[list=1][*]Backup machen
+[*]Edomi auf aktuelle Version updaten
+[*]Erneutes Backup machen
+[*]Neues Image pullen
+[*]Edomi stoppen
+[*]Neuen Container basierend auf neuem Image incl. der vorhandenen Volumes einrichten
+[*]Neuen Container starten
+[*]Backup einspielen
+[/list]
+
+[b]Achtung 2:[/b] Aufpassen beim Mapping des Websocket-Port! Dieser Port muss auf beiden Seiten gleich sein, also bspw. 8080:8080. Ausserdem muss dieser in der Environment-Variable WEBSOCKETPORT übergeben werden, weil er beim Start in die Edomi-Konfiguration eingetragen wird. Somit darf der Websocket-Port nicht über das Admin-UI geändert werden!
+
+[b]Achtung 3:[/b] Die Requirements für den MikroTik-LBS (19001059) sind nicht mehr enthalten, da diese aktuell das Image um über 1G aufblasen! Wenn sich das wieder normalisieren sollte, werde ich diese gern wieder mit reinnehmen.
+
+Feedback ist wie immer gern gesehen, also immer her damit!

@@ -1,9 +1,8 @@
 ## Edomi-Docker
 
- This is a docker implementation for Edomi, a PHP-based smarthome framework.
- It is based on the initial work of [pfischi](https://github.com/pfischi/edomi-docker), thx a lot!
+This is a Docker implementation for Edomi, a PHP-based smarthome framework.
 
- For more information please refer to [Official website](http://www.edomi.de/) or [Support forum](https://knx-user-forum.de/forum/projektforen/edomi)
+For more information please refer to [Official website](http://www.edomi.de/) or [Support forum](https://knx-user-forum.de/forum/projektforen/edomi)
 
 
 ### 1. Build/Use the Edomi Container
@@ -18,7 +17,7 @@ I've added openssh-server and additionally I've set the root password to '_12345
 #### 1.1 Image from Docker Hub
 
 ```shell
-sudo docker pull starwarsfan/edomi-docker
+sudo docker pull starwarsfan/edomi-docker:amd64-latest
 ```
 
 #### 1.2 Build from scratch
@@ -30,8 +29,8 @@ the image from the first build step.
 ##### Pull Edomi-Docker Git repos from GitHub
 
 ```shell
-sudo git clone https://github.com/starwarsfan/edomi-baseimage.git
-sudo git clone https://github.com/starwarsfan/edomi-docker.git
+git clone https://github.com/starwarsfan/edomi-baseimage.git
+git clone https://github.com/starwarsfan/edomi-docker.git
 ```
 
 ##### Build Edomi baseimage
@@ -39,22 +38,35 @@ sudo git clone https://github.com/starwarsfan/edomi-docker.git
 ```shell
 cd edomi-baseimage
 sudo docker build \
-    -t starwarsfan/edomi-baseimage:6.8.1 .
+    -f amd64.Dockerfile \
+    -t starwarsfan/edomi-baseimage:amd64-latest .
 ```
 
-##### Build Edomi Docker image itself
+##### Build Edomi Docker image
+
+If you built an own Edomi-Baseimage (the step before), you need to update it's reference
+on the first line of the Dockerfile. The default first line looks like the following snippet,
+where the version should be replaced with `latest`, if you build your personal base image
+with `latest` as version:
+
+```shell
+FROM starwarsfan/edomi-baseimage:amd64-latest
+```
+
+Afterwards you can trigger the build with:
 
 ```shell
 cd edomi-docker
 sudo docker build \
-    -t starwarsfan/edomi-docker:latest .
+    -f amd64.Dockerfile \
+    -t starwarsfan/edomi-docker:amd64-latest .
 ```
 
 You can pass a different root passwort to the build and you can pass the Edomi version to download too:
 
 ```shell
 sudo docker build \
-    -t starwarsfan/edomi-docker:latest \
+    -t starwarsfan/edomi-docker:amd64-latest \
     --build-arg ROOT_PASS=Th3Passw0rd \
     --build-arg EDOMI_VERSION=EDOMI-Beta_156.zip .
 ```
@@ -66,23 +78,22 @@ sudo docker build \
 sudo docker run \
     --name edomi \
     --restart=on-failure \
-    -p 80:80 \
-    -p 8080:8080 \
-    -p 3671:3671/udp \
+    -p 80:88 \
     -p 50000:50000/udp \
     -p 50001:50001/udp \
     -p 22222:22 \
-    -e KNXGATEWAY=192.168.178.4 \
     -e KNXACTIVE=true \
-	-e WEBSOCKETPORT=8080
+    -e KNXGATEWAYIP=192.168.178.4 \
+    -e KNXGATEWAYPORT=3700 \
     -e HOSTIP=192.168.178.3 \
     -d \
-    starwarsfan/edomi-docker:latest
+    starwarsfan/edomi-docker:amd64-latest
 ```
 
 With this configuration the edomi web instance is reachable via URL _http://\<docker-host-ip\>/admin_ or
 _https://\<docker-host-ip\>/admin_ and the commandline via ssh with _ssh -p 22222 \<docker-host-ip\>_.
-With the (optional) parameters KNXGATEWAY, KNXACTIVE and HOSTIP you can pre-configure some settings for Edomi.
+With the (optional) parameters KNXGATEWAYIP, KNXGATEWAYPORT, KNXACTIVE and HOSTIP you can pre-configure some 
+settings for Edomi.
 Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "global_serverIP" in Edomi (or via
 docker run parameter 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
 Change http and/or https port to your needs.
@@ -90,42 +101,74 @@ Change http and/or https port to your needs.
 If you use other Edomi modules which communicate using dedicated ports, you need to map them using additional
 _-p <host-port>:<container-port>_ parameters.
 
-#### 2.1 Explanation of parameters
+#### 2.1 Portmappings
 
 **It is important to map all used ports!** According to the example with the default values above, here's a short
 description:
- * -p 80:80
 
-   Mapping of used http port to Edomi http port.
+**Mandatory:**
+ * -p 80:88
 
- * -p 8080:8080
+   Mapping of used http port to internal Edomi http port. This port is used to access the admin ui 
+   (http://.../admin/) and the visualization (http://.../visu/)
+   **Important:** If a different source port than 80 is used, HTTPPORT must be set with this port too!
 
-   Mapping of Websocket port. These values must be the same on both sides of the colon and correspond to the
-   configuration value on Edomi base configuration.
-   The "WEBSOCKETPORT" variable will allow to set the websocket port in the edomi configuration.
-   All three values (both sides of the mapping as well as the "WEBSOCKETPORT" value) must match.
-
- * -p 3671:3671/udp
-
-   Mapping of used port for KNX traffic. As this is UDP traffic, it must be finished with "/udp" right after
-   the internal port, which must correspond to the configuration value on Edomi base configuration.
-
+**Optional:**
  * -p 50000:50000/udp
 
-   Mapping of used port for KNX control endpoint. As this is UDP traffic, it must be finished with "/udp"
-   right after the internal port, which must correspond to the configuration value on Edomi base configuration.
+   If using KNX, the mapping of used port for KNX control endpoint. As this is UDP traffic, it must be finished 
+   with "/udp" right after the internal port, which must correspond to the configuration value on Edomi base 
+   configuration.
 
  * -p 50001:50001/udp
 
-   Mapping of used port for KNX data endpoint. As this is UDP traffic, it must be finished with "/udp"
+   If using KNX, the mapping of used port for KNX data endpoint. As this is UDP traffic, it must be finished with "/udp"
    right after the internal port, which must correspond to the configuration value on Edomi base configuration.
 
  * -p 22222:22
 
-   Mapping of used ssh port to access the container using ssh.
+   Mapping of used ssh port to access the container using ssh. If not mapping some external port to port 22,
+   ssh can't be used to access the container.
 
+#### 2.2 Environment variables
+**Mandatory:**
+ * -e HOSTIP=192.168.178.3
 
-**Please note:**
+  IP of the host on which the container is running
+
+**Optional:**
+ * -e ROOT_PASS=sup3rS3cr3tPassw0rd
+
+  The password to access the container using ssh. You should set this var with a password of your choice
+  as the default root password is 123456. If the container is initially starting, a ssh keypair will be
+  created and the private key is printed to stdout. So have a look at the container log to get the private
+  key for ssh access.
+  
+  It doesn't matter if you're _not_ mapping some external port to the ssh port (22) inside of the container 
+  as in this case the container can't be accessed using ssh.
+
+ * -e HTTPPORT=80
+
+  If a different http source port than 80 is mapped, this variable must be set with the used port!
+
+ * -e KNXACTIVE=true
+   
+   Used to activate Edomi's KNX module
+
+ * -e KNXGATEWAYIP=192.168.178.4 
+   
+   IP address of the used KNX gateway
+
+ * -e KNXGATEWAYPORT=3700 
+   
+   Port to access KNX on the gateway
+
+ * -e TZ=Europe/Zurich 
+   
+   Timezone to use on Edomi configuration
+
+#### 2.3 Restart behaviour
+**Important!**
 
 It is important to use the option _--restart=on-failure_ because it is used to handle Edomi shutdown or restart
 from the admin ui. The trick is to exit the container with a non zero exit code in case Edomi should be restartet.
@@ -134,14 +177,53 @@ will not be restartet again.
 
 ### 3. Mount external content
 
+The image offers three mountpoints:
+
+* /var/edomi-backups
+* /var/lib/mysql
+* /usr/local/edomi
+
+So it is possible to use dedicated volumes, which enables the possibility to reuse the volumes on a new container.
+
 #### 3.1 Mount volume or folder for backups
 
-With the additional run parameter _-v <host-folder>:/var/edomi-backups/_ you can mount a folder on the docker
-host which contains the Edomi backups outside of the container. So the run command may look like the following
-example:
+With the additional run parameter _-v <host-folder>:<mountpoint>_ or _-v <volume>:<mountpoint>_ you can mount a
+folder from the Docker host or a Docker volume into the container.
+
+The usage of volumes should be preferred, as this offers the most flexibility. To do so, at first you should
+create empty volumes:
 
 ```shell
-sudo docker run --name edomi -v /data/edomi-backups/:/var/edomi-backups/ ...
+sudo docker volume create edomi-backups
+sudo docker volume create edomi-db
+sudo docker volume create edomi-installation
+```
+
+Now the container can be started using these volumes:
+
+```shell
+sudo docker run \
+    --name edomi \
+    -v edomi-backups:/var/edomi-backups \
+    -v edomi-db:/var/lib/mysql \
+    -v edomi-installation:/usr/local/edomi \
+    ...
+```
+
+If a new container is created using _empty_ volumes, then the content which is already existing on the used
+location inside the used Docker image is copied onto the volume. So if you _docker run_ a new Edomi instance,
+the whole content from these three mountpoint directories will be copied to the used volumes. So if the container
+instance is destroyed and the volumes where used on a new Edomi instance, the content from the previous instance
+will be there.
+
+The usage of a directory from the Docker host instead of a volume is similar in it's usage. You need to use
+the full path to the folder on the left side of the colon:
+
+```shell
+sudo docker run \
+    --name edomi \
+    -v /data/edomi-backups/:/var/edomi-backups/ \
+    ...
 ```
 
 
@@ -156,34 +238,56 @@ example:
 sudo docker run --name edomi -v /home/edomi/feiertage.csv:/usr/local/edomi/www/visu/feiertage.csv ...
 ```
 
+#### 4 Reverse proxy in front of Edomi container
+If you use an Nginx reverse proxy in front of the Edomi container, you need to 
+add the following location entry:
+```
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
+server {
+    ...
+    location /edomi {
+        sub_filter          "WebSocket(serverProtocol+'://'+serverIp+':88/websocket')" "WebSocket(serverProtocol+'://'+serverIp+'/edomi/websocket')";
+        sub_filter_types    application/javascript;
+        sub_filter_once     off;
+
+        proxy_pass          http://192.168.123.123:88/;
+        proxy_set_header    X-Forwarded-Host $host;
+        proxy_set_header    X-Forwarded-Server $host;
+        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Real-IP $remote_addr;
+        proxy_redirect>     off;
+        proxy_http_version  1.1;
+        proxy_set_header    Upgrade $http_upgrade;
+        proxy_set_header    Connection "upgrade";
+    }
+```
+To make this work you need to replace:
+- `edomi` (2 times) with your used path to Edomi
+- `88` (also 2 times) with the used source port, which you map onto the container
+- `192.168.123.123` with the IP of the machine, where the Edomi container is running
+
+**Important:** Make sure to replace only `edomi` and `88` with your used values, 
+don't touch the slashes a/o colon right before or after the replacements!
+
+#### 5 Migrate from Edomi 1.x (CentOS 6 Container) to 2.x with CentOS 7 Container
+
+* Backup current Edomi instance using `Verwaltung > Datensicherung > Backup herunterladen`
+* Create volumes to store data, see 3.1 above
+* Start new container using created volumes
+* Copy downloaded backup to created backup-volume
+* Import backup using `Verwaltung > Datensicherung > Wiederherstellung`
+
 ### Appendix
 
-#### A Install docker
+#### A: Install docker
 
- This instruction works for a <b>Centos7</b> docker host. Other distributions may need some adjustments.
+See https://docs.docker.com/engine/install/
 
-```shell
-sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/7/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
-EOF
-```
-
-```shell
-sudo yum install docker-engine -y
-```
-```shell
-sudo systemctl enable docker.service
-```
-```shell
-sudo systemctl start docker.service
-```
-
-#### B Useful commands
+#### B: Useful commands
 
 Check running / stopped container:
 
