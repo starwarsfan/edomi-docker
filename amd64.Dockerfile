@@ -1,4 +1,4 @@
-FROM starwarsfan/edomi-baseimage:latest-amd64
+FROM starwarsfan/edomi-baseimage:8.0.1-amd64
 MAINTAINER Yves Schumann <y.schumann@yetnet.ch>
 
 # Define build arguments
@@ -40,12 +40,14 @@ RUN cd ${EDOMI_EXTRACT_PATH} \
 # Enable ssl for edomi
 # Disable chmod for not existing /dev/vcsa
 # Disable removal of mysql.sock
+# Replace disabled update site IP
 RUN sed -i -e "\$aLoadModule log_config_module modules/mod_log_config.so" \
            -e "\$aLoadModule setenvif_module modules/mod_setenvif.so" /etc/httpd/conf.d/ssl.conf \
  && sed -i -e "s/^\(.*vcsa\)/#\1/g" \
            -e "s/\(service mysqld stop\)/#\1/g" \
            -e "s@\(rm -f \$MYSQL_PATH/mysql.sock\)@#\1@g" \
-           -e "s/\(service mysqld start\)/#\1/g" /usr/local/edomi/main/start.sh
+           -e "s/\(service mysqld start\)/#\1/g" /usr/local/edomi/main/start.sh \
+ && sed -i -e "s/62\.75\.208\.51/edomi\.de/g" /usr/local/edomi/edomi.ini
 
 # Nginx:
 # - Backup default nginx.conf

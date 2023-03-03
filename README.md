@@ -107,11 +107,12 @@ _-p <host-port>:<container-port>_ parameters.
 description:
 
 **Mandatory:**
- * -p 80:88
+ * -p <host-port>:88
 
    Mapping of used http port to internal Edomi http port. This port is used to access the admin ui 
-   (http://.../admin/) and the visualization (http://.../visu/)
-   **Important:** If a different source port than 80 is used, HTTPPORT must be set with this port too!
+   (`http://<host-ip>:<host-port>/admin/`) and the visualization (`http://<host-ip>:<host-port>/visu/`)
+   
+   **Important:** If a different source port than 80 is used, HTTPPORT must be set with the used port too!
 
 **Optional:**
  * -p 50000:50000/udp
@@ -134,22 +135,22 @@ description:
 **Mandatory:**
  * -e HOSTIP=192.168.178.3
 
-  IP of the host on which the container is running
+   IP of the host on which the container is running
 
 **Optional:**
  * -e ROOT_PASS=sup3rS3cr3tPassw0rd
 
-  The password to access the container using ssh. You should set this var with a password of your choice
+   The password to access the container using ssh. You should set this var with a password of your choice
   as the default root password is 123456. If the container is initially starting, a ssh keypair will be
   created and the private key is printed to stdout. So have a look at the container log to get the private
   key for ssh access.
   
-  It doesn't matter if you're _not_ mapping some external port to the ssh port (22) inside of the container 
+   It doesn't matter if you're _not_ mapping some external port to the ssh port (22) inside of the container 
   as in this case the container can't be accessed using ssh.
 
  * -e HTTPPORT=80
 
-  If a different http source port than 80 is mapped, this variable must be set with the used port!
+   If a different http source port than 80 is mapped, this variable must be set with the used port!
 
  * -e KNXACTIVE=true
    
@@ -170,7 +171,7 @@ description:
 #### 2.3 Restart behaviour
 **Important!**
 
-It is important to use the option _--restart=on-failure_ because it is used to handle Edomi shutdown or restart
+It is important to use the option `--restart=on-failure` because it is used to handle Edomi shutdown or restart
 from the admin ui. The trick is to exit the container with a non zero exit code in case Edomi should be restartet.
 If it should be shut down, the exit code will be zero, which is not a failure for Docker and so the container
 will not be restartet again.
@@ -187,7 +188,7 @@ So it is possible to use dedicated volumes, which enables the possibility to reu
 
 #### 3.1 Mount volume or folder for backups
 
-With the additional run parameter _-v <host-folder>:<mountpoint>_ or _-v <volume>:<mountpoint>_ you can mount a
+With the additional run parameter `-v <host-folder>:<mountpoint>` or `-v <volume>:<mountpoint>` you can mount a
 folder from the Docker host or a Docker volume into the container.
 
 The usage of volumes should be preferred, as this offers the most flexibility. To do so, at first you should
@@ -212,8 +213,8 @@ sudo docker run \
 
 If a new container is created using _empty_ volumes, then the content which is already existing on the used
 location inside the used Docker image is copied onto the volume. So if you _docker run_ a new Edomi instance,
-the whole content from these three mountpoint directories will be copied to the used volumes. So if the container
-instance is destroyed and the volumes where used on a new Edomi instance, the content from the previous instance
+the whole content from these three mountpoint directories will be copied to the used volumes. If the container
+instance is destroyed and the volumes where re-used on a new Edomi instance, the content from the previous instance
 will be there.
 
 The usage of a directory from the Docker host instead of a volume is similar in it's usage. You need to use
@@ -226,16 +227,21 @@ sudo docker run \
     ...
 ```
 
+**Important:** The copy-step of the container content into an empty volume is not working with bind mounts! So The usage of bind mounts from the host into the container makes sense only for the backups.
+
 
 #### 3.2 Mount dedicated files
 
-With the additional run parameter _-v <host-folder>/<filename>:<container-folder>/<filename>_ you can
+With the additional run parameter `-v <host-folder>/<filename>:<container-folder>/<filename>` you can
 mount a file on the docker host into the Edomi container. This is useful if you use LBS like LBS19000690
 (Jahrestage), which require access to separate files. So the run command may look like the following
 example:
 
 ```shell
-sudo docker run --name edomi -v /home/edomi/feiertage.csv:/usr/local/edomi/www/visu/feiertage.csv ...
+sudo docker run \
+    --name edomi \
+    -v /home/edomi/feiertage.csv:/usr/local/edomi/www/visu/feiertage.csv \
+    ...
 ```
 
 #### 4 Reverse proxy in front of Edomi container
@@ -266,15 +272,16 @@ server {
     }
 ```
 To make this work you need to replace:
-- `edomi` (2 times) with your used path to Edomi
+- `edomi` (2 times) with your used path from the URL to Edomi
 - `88` (also 2 times) with the used source port, which you map onto the container
 - `192.168.123.123` with the IP of the machine, where the Edomi container is running
 
 **Important:** Make sure to replace only `edomi` and `88` with your used values, 
 don't touch the slashes a/o colon right before or after the replacements!
 
-#### 5 Migrate from Edomi 1.x (CentOS 6 Container) to 2.x with CentOS 7 Container
+#### 5 Migrate from Edomi 1.x (CentOS 6 Container) to 2.x with Rocky Linux Container
 
+* Update Edomi to the latest version
 * Backup current Edomi instance using `Verwaltung > Datensicherung > Backup herunterladen`
 * Create volumes to store data, see 3.1 above
 * Start new container using created volumes
