@@ -33,7 +33,7 @@ helpMe() {
 PUSH_IMAGE=''
 BUILD_ARM_IMAGES=false
 PLATFORM='linux/amd64'
-IMAGE_VERSION=2.03.6
+IMAGE_VERSION=2.03.7
 
 while getopts aph? option; do
     case ${option} in
@@ -59,3 +59,5 @@ docker buildx \
     ${PUSH_IMAGE} \
     .
 info " -> Done"
+
+# docker buildx imagetools create -t starwarsfan/edomi-docker:${IMAGE_VERSION} starwarsfan/edomi-docker:latest-buildx
