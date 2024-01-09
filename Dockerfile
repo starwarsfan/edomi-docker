@@ -1,4 +1,5 @@
-FROM starwarsfan/edomi-baseimage:latest-buildx
+ARG BUILDER_VERSION=latest
+FROM starwarsfan/edomi-baseimage:${BUILDER_VERSION}
 MAINTAINER Yves Schumann <y.schumann@yetnet.ch>
 
 # Define build arguments
