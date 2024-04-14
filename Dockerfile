@@ -60,7 +60,8 @@ COPY etc/nginx/conf.d/edomi.conf /etc/nginx/conf.d/
 
 # Enable lib_mysqludf_sys
 RUN systemctl start mariadb \
- && mysql -u root mysql < /root/installdb.sql \
+ && mysql -u root mysql < /root/installdb_mysqludf_log.sql \
+ && mysql -u root mysql < /root/installdb_mysqludf_sys.sql \
  && systemctl stop mariadb
 
 # Mount points
