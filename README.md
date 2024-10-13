@@ -38,27 +38,16 @@ git clone https://github.com/starwarsfan/edomi-docker.git
 ```shell
 cd edomi-baseimage
 sudo docker build \
-    -f amd64.Dockerfile \
     -t starwarsfan/edomi-baseimage:latest .
 ```
 
 ##### Build Edomi Docker image
 
-If you built an own Edomi-Baseimage (the step before), you need to update it's reference
-on the first line of the Dockerfile. The default first line looks like the following snippet,
-where the version should be replaced with `latest`, if you build your personal base image
-with `latest` as version:
-
-```shell
-FROM starwarsfan/edomi-baseimage:amd64-latest
-```
-
-Afterwards you can trigger the build with:
+Just build the same way as the baseimage before:
 
 ```shell
 cd edomi-docker
 sudo docker build \
-    -f amd64.Dockerfile \
     -t starwarsfan/edomi-docker:latest .
 ```
 
@@ -92,7 +81,7 @@ sudo docker run \
 
 With this configuration the edomi web instance is reachable via URL _http://\<docker-host-ip\>/admin_ or
 _https://\<docker-host-ip\>/admin_ and the commandline via ssh with _ssh -p 22222 \<docker-host-ip\>_.
-With the (optional) parameters KNXGATEWAYIP, KNXGATEWAYPORT, KNXACTIVE and HOSTIP you can pre-configure some 
+With the (optional) parameters KNXGATEWAYIP, KNXGATEWAYPORT, KNXACTIVE and HOSTIP you can pre-configure some
 settings for Edomi.
 Leave it empty to do this via the Edomi admin webpage. Keep in mind to set "global_serverIP" in Edomi (or via
 docker run parameter 'HOSTIP') to your Docker host IP. Otherwise the KNX communication probably will not work.
@@ -109,16 +98,16 @@ description:
 **Mandatory:**
  * -p <host-port>:88
 
-   Mapping of used http port to internal Edomi http port. This port is used to access the admin ui 
+   Mapping of used http port to internal Edomi http port. This port is used to access the admin ui
    (`http://<host-ip>:<host-port>/admin/`) and the visualization (`http://<host-ip>:<host-port>/visu/`)
-   
+
    **Important:** If a different source port than 80 is used, HTTPPORT must be set with the used port too!
 
 **Optional:**
  * -p 50000:50000/udp
 
-   If using KNX, the mapping of used port for KNX control endpoint. As this is UDP traffic, it must be finished 
-   with "/udp" right after the internal port, which must correspond to the configuration value on Edomi base 
+   If using KNX, the mapping of used port for KNX control endpoint. As this is UDP traffic, it must be finished
+   with "/udp" right after the internal port, which must correspond to the configuration value on Edomi base
    configuration.
 
  * -p 50001:50001/udp
@@ -144,8 +133,8 @@ description:
   as the default root password is 123456. If the container is initially starting, a ssh keypair will be
   created and the private key is printed to stdout. So have a look at the container log to get the private
   key for ssh access.
-  
-   It doesn't matter if you're _not_ mapping some external port to the ssh port (22) inside of the container 
+
+   It doesn't matter if you're _not_ mapping some external port to the ssh port (22) inside of the container
   as in this case the container can't be accessed using ssh.
 
  * -e HTTPPORT=80
@@ -153,19 +142,19 @@ description:
    If a different http source port than 80 is mapped, this variable must be set with the used port!
 
  * -e KNXACTIVE=true
-   
+
    Used to activate Edomi's KNX module
 
- * -e KNXGATEWAYIP=192.168.178.4 
-   
+ * -e KNXGATEWAYIP=192.168.178.4
+
    IP address of the used KNX gateway
 
- * -e KNXGATEWAYPORT=3700 
-   
+ * -e KNXGATEWAYPORT=3700
+
    Port to access KNX on the gateway
 
- * -e TZ=Europe/Zurich 
-   
+ * -e TZ=Europe/Zurich
+
    Timezone to use on Edomi configuration
 
 #### 2.3 Restart behaviour
@@ -245,7 +234,7 @@ sudo docker run \
 ```
 
 #### 4 Reverse proxy in front of Edomi container
-If you use an Nginx reverse proxy in front of the Edomi container, you need to 
+If you use an Nginx reverse proxy in front of the Edomi container, you need to
 add the following location entry:
 ```
 map $http_upgrade $connection_upgrade {
@@ -276,7 +265,7 @@ To make this work you need to replace:
 - `88` (also 2 times) with the used source port, which you map onto the container
 - `192.168.123.123` with the IP of the machine, where the Edomi container is running
 
-**Important:** Make sure to replace only `edomi` and `88` with your used values, 
+**Important:** Make sure to replace only `edomi` and `88` with your used values,
 don't touch the slashes a/o colon right before or after the replacements!
 
 #### 5 Migrate from Edomi 1.x (CentOS 6 Container) to 2.x with Rocky Linux Container
