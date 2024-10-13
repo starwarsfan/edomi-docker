@@ -17,7 +17,7 @@ I've added openssh-server and additionally I've set the root password to '_12345
 #### 1.1 Image from Docker Hub
 
 ```shell
-sudo docker pull starwarsfan/edomi-docker:amd64-latest
+sudo docker pull starwarsfan/edomi-docker:latest
 ```
 
 #### 1.2 Build from scratch
