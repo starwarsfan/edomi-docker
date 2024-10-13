@@ -80,14 +80,14 @@ else
 	sed -i -e "s#global_knxGatewayActive=.*#global_knxGatewayActive=$KNXACTIVE#" ${EDOMI_CONF}
 fi
 
-if [ -z "$WEBSOCKETPORT" ]; then
-	echo "WEBSOCKETPORT not set, using edomi default settings."
-else
-	echo "WEBSOCKETPORT set to $WEBSOCKETPORT ... configure $EDOMI_CONF"
-	sed -i -e "s#global_visuWebsocketPort=.*#global_visuWebsocketPort='$WEBSOCKETPORT'#" ${EDOMI_CONF}
-	echo "... and $NGINX_CONF"
-	sed -i -e "s#http://127.0.0.1:8080#http://127.0.0.1:$WEBSOCKETPORT#" ${NGINX_CONF}
-fi
+#if [ -z "$WEBSOCKETPORT" ]; then
+#	echo "WEBSOCKETPORT not set, using edomi default settings."
+#else
+#	echo "WEBSOCKETPORT set to $WEBSOCKETPORT ... configure $EDOMI_CONF"
+#	sed -i -e "s#global_visuWebsocketPort=.*#global_visuWebsocketPort='$WEBSOCKETPORT'#" ${EDOMI_CONF}
+#	echo "... and $NGINX_CONF"
+#	sed -i -e "s#http://127.0.0.1:8080#http://127.0.0.1:$WEBSOCKETPORT#" ${NGINX_CONF}
+#fi
 
 if [ -z "$HTTPPORT" ]; then
 	echo "HTTPPORT not set, using edomi default settings."
