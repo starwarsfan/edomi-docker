@@ -17,7 +17,7 @@ I've added openssh-server and additionally I've set the root password to '_12345
 #### 1.1 Image from Docker Hub
 
 ```shell
-sudo docker pull starwarsfan/edomi-docker:amd64-latest
+sudo docker pull starwarsfan/edomi-docker:latest
 ```
 
 #### 1.2 Build from scratch
@@ -39,7 +39,7 @@ git clone https://github.com/starwarsfan/edomi-docker.git
 cd edomi-baseimage
 sudo docker build \
     -f amd64.Dockerfile \
-    -t starwarsfan/edomi-baseimage:amd64-latest .
+    -t starwarsfan/edomi-baseimage:latest .
 ```
 
 ##### Build Edomi Docker image
@@ -59,14 +59,14 @@ Afterwards you can trigger the build with:
 cd edomi-docker
 sudo docker build \
     -f amd64.Dockerfile \
-    -t starwarsfan/edomi-docker:amd64-latest .
+    -t starwarsfan/edomi-docker:latest .
 ```
 
 You can pass a different root passwort to the build and you can pass the Edomi version to download too:
 
 ```shell
 sudo docker build \
-    -t starwarsfan/edomi-docker:amd64-latest \
+    -t starwarsfan/edomi-docker:latest \
     --build-arg ROOT_PASS=Th3Passw0rd \
     --build-arg EDOMI_VERSION=EDOMI-Beta_156.zip .
 ```
@@ -87,7 +87,7 @@ sudo docker run \
     -e KNXGATEWAYPORT=3700 \
     -e HOSTIP=192.168.178.3 \
     -d \
-    starwarsfan/edomi-docker:amd64-latest
+    starwarsfan/edomi-docker:latest
 ```
 
 With this configuration the edomi web instance is reachable via URL _http://\<docker-host-ip\>/admin_ or
